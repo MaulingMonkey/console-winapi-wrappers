@@ -83,9 +83,11 @@ pub fn attach_console_parent_process() -> io::Result<()> {
 //
 // | [CreatePseudoConsole]             | ![x] Allocates a new pseudoconsole for the calling process.
 // | [ClosePseudoConsole]              | ![x] Closes a pseudoconsole from the given handle.
+// | [ResizePseudoConsole]             | ![x]
 //
 // [CreatePseudoConsole]:              https://docs.microsoft.com/en-us/windows/console/createpseudoconsole
 // [ClosePseudoConsole]:               https://docs.microsoft.com/en-us/windows/console/closepseudoconsole
+// [ResizePseudoConsole]:              https://docs.microsoft.com/en-us/windows/console/resizepseudoconsole
 
 
 

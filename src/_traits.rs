@@ -22,3 +22,14 @@ pub trait IntoCoord {
 impl IntoCoord for COORD { fn into_coord(self) -> COORD { self } }
 impl IntoCoord for (SHORT, SHORT) { fn into_coord(self) -> COORD { #[allow(non_snake_case)] let (X, Y) = self; COORD { X, Y } } }
 impl IntoCoord for [SHORT; 2] { fn into_coord(self) -> COORD { #[allow(non_snake_case)] let [X, Y] = self; COORD { X, Y } } }
+
+
+
+/// `()`
+pub trait Reserved : sealed::Reserved {}
+impl Reserved for () {}
+
+mod sealed {
+    pub trait Reserved {}
+    impl Reserved for () {}
+}
