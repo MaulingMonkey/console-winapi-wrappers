@@ -1,0 +1,29 @@
+# https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[package]
+name                = "maulingmonkey-console-winapi-wrappers"
+version             = "0.0.0-git"
+edition             = "2018"
+authors             = ["MaulingMonkey <git@maulingmonkey.com>"]
+readme              = "Readme.md"
+license             = "MIT OR Apache-2.0"
+
+[lib]
+path                = "src/_lib.rs"
+
+[dependencies]
+winapi.version      = "0.3.9"
+winapi.features     = [
+    # shared
+    "minwindef",
+    "ntdef",
+    "winerror",
+
+    # um
+    "consoleapi",
+    "handleapi",
+    "processthreadsapi",
+    "wincon",
+    "wincontypes",
+    "winnt",
+]
