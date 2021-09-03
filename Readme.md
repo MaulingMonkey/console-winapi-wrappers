@@ -13,6 +13,32 @@ Wrappers for [winapi](https://docs.rs/winapi/)'s [Console Functions](https://doc
 
 
 
+## Quickstart
+
+```toml
+# .cargo/config.toml
+[net]
+git-fetch-with-cli = true
+```
+
+```toml
+# Cargo.toml
+[dependencies]
+maulingmonkey-console-winapi-wrappers.git   = "ssh://git@github.com/MaulingMonkey/maulingmonkey-console-winapi-wrappers.git"
+```
+
+```rust
+// src\main.rs
+use maulingmonkey_console_winapi_wrappers::*;
+
+fn main() {
+    let _ = alloc_console();
+    println!("Hello, world!");
+}
+```
+
+
+
 <h2 name="license">License</h2>
 
 Licensed under either of
