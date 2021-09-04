@@ -33,17 +33,17 @@
 | <code>let c : [COORD] = [GetConsoleFontSize]\(stdout, 42);</code>                                 | <code>let c : [COORD] = [get_console_font_size]\(&mut [stdout]\(), 42)?;</code>
 | <code>[GetConsoleHistoryInfo]\(&mut info);</code>                                                 | <code>let info = [get_console_history_info]\()?;</code>
 | <code>[GetConsoleMode]\(handle, &mut mode);</code>                                                | <code>let mode = [get_console_mode]\(handle)?;</code>
-| <code>[GetConsoleOriginalTitle]\(...);</code>                                                     | ...
+| <code>[GetConsoleOriginalTitleW]\(title.as_mut_ptr(); title.len() as _);</code>                                                     | <code>let title : [OsString] = [get_console_original_title]\()?;</code>
 | <code>codepage = [GetConsoleOutputCP]\();</code>                                                  | <code>codepage = [get_console_output_cp]\()?;</code>
 | <code>[GetConsoleProcessList]\(...);</code>                                                       | ...
 | <code>[GetConsoleScreenBufferInfo]\(stdout, &mut info);</code>                                    | <code>let info = [get_console_screen_buffer_info]\(&mut [stdout]\())?;</code>
 | <code>[GetConsoleScreenBufferInfoEx]\(stdout, &mut info);</code>                                  | <code>let info = [get_console_screen_buffer_info_ex]\(&mut [stdout]\())?;</code>
 | <code>[GetConsoleSelectionInfo]\(&mut info);</code>                                               | <code>let info = [get_console_selection_info]\()?;</code>
-| <code>[GetConsoleTitle]\(...);</code>                                                             | ...
-| <code>[GetConsoleWindow]\(...);</code>                                                            | ...
+| <code>[GetConsoleTitleW]\(title.as_mut_ptr(), title.len() as _);</code>                            | <code>let title : [OsString] = [get_console_title]\()?;</code>
+| <code>let hwnd : [HWND] = [GetConsoleWindow]\();</code>                                           | <code>let hwnd : [HWND] = [get_console_window]\()?;</code>
 | <code>[GetCurrentConsoleFont]\(stdout, &mut info);</code>                                         | <code>let info = [get_current_console_font]\(&mut [stdout]\())?;</code>
 | <code>[GetCurrentConsoleFontEx]\(stdout, &mut info);</code>                                       | <code>let info = [get_current_console_font_ex]\(&mut [stdout]\())?;</code>
-| <code>[GetLargestConsoleWindowSize]\(...);</code>                                                 | ...
+| <code>[GetLargestConsoleWindowSize]\(stdout);</code>                                              | <code>let s : [COORD] = [get_largest_console_window_size]\(&[stdout]\())?;</code>
 | <code>let events = [GetNumberOfConsoleInputEvents]\(stdout);</code>                               | <code>let events = [get_number_of_console_input_events]\(&mut [stdout]\())?;</code>
 | <code>let buttons = [GetNumberOfConsoleMouseButtons]\();</code>                                   | <code>let buttons = [get_number_of_console_mouse_buttons]\()?;</code>
 | <pre>use winapi::um::{processenv, winbase}::*;<br>let h = [GetStdHandle]\(STD_INPUT_HANDLE);<br>let h = [GetStdHandle]\(STD_OUTPUT_HANDLE);<br>let h = [GetStdHandle]\(STD_ERROR_HANDLE);</pre> | <pre>use [std::os::windows::io::AsRawHandle];<br>let h = [std::io::stdin]\().[as_raw_handle]\().cast();<br>let h = [std::io::stdout]\().[as_raw_handle]\().cast();<br>let h = [std::io::stderr]\().[as_raw_handle]\().cast();</pre>
@@ -68,8 +68,8 @@
 | <code>[SetConsoleScreenBufferInfoEx]\(...);</code>                                                | ...
 | <code>[SetConsoleScreenBufferSize]\(...);</code>                                                  | ...
 | <code>[SetConsoleTextAttribute]\(stdout, green);</code>                                           | <code>[set_console_text_attribute]\(&mut [stdout]\(), green)?;</code>
-| <code>[SetConsoleTitle]\(...);</code>                                                             | ...
-| <code>[SetConsoleWindowInfo]\(...);</code>                                                        | ...
+| <code>[SetConsoleTitleW]\([wchar::whcz!](`"new title"`).as_ptr());</code>                         | <code>[set_console_title]\(`"new title"`)?;</code>
+| <code>[SetConsoleWindowInfo]\(stdout, FALSE, &[SMALL_RECT] { Left: 0, Top: 0, Right: 80, Bottom: 25 });</code> | <code>[set_console_window_info]\(&mut [stdout]\(), false, (0,0) .. (80,25))?;</code>
 | <code>[SetCurrentConsoleFontEx]\(...);</code>                                                     | ...
 | <code>[SetStdHandle]\(...);</code>                                                                | ...
 | <code>[WriteConsole]\(stdout, ...);</code>                                                        | <code>[write_console]\(&mut [stdout]\(), ...)?;</code>
@@ -100,13 +100,13 @@
 [GetConsoleFontSize]:               https://docs.microsoft.com/en-us/windows/console/getconsolefontsize
 [GetConsoleHistoryInfo]:            https://docs.microsoft.com/en-us/windows/console/getconsolehistoryinfo
 [GetConsoleMode]:                   https://docs.microsoft.com/en-us/windows/console/getconsolemode
-[GetConsoleOriginalTitle]:          https://docs.microsoft.com/en-us/windows/console/getconsoleoriginaltitle
+[GetConsoleOriginalTitleW]:         https://docs.microsoft.com/en-us/windows/console/getconsoleoriginaltitle
 [GetConsoleOutputCP]:               https://docs.microsoft.com/en-us/windows/console/getconsoleoutputcp
 [GetConsoleProcessList]:            https://docs.microsoft.com/en-us/windows/console/getconsoleprocesslist
 [GetConsoleScreenBufferInfo]:       https://docs.microsoft.com/en-us/windows/console/getconsolescreenbufferinfo
 [GetConsoleScreenBufferInfoEx]:     https://docs.microsoft.com/en-us/windows/console/getconsolescreenbufferinfoex
 [GetConsoleSelectionInfo]:          https://docs.microsoft.com/en-us/windows/console/getconsoleselectioninfo
-[GetConsoleTitle]:                  https://docs.microsoft.com/en-us/windows/console/getconsoletitle
+[GetConsoleTitleW]:                 https://docs.microsoft.com/en-us/windows/console/getconsoletitle
 [GetConsoleWindow]:                 https://docs.microsoft.com/en-us/windows/console/getconsolewindow
 [GetCurrentConsoleFont]:            https://docs.microsoft.com/en-us/windows/console/getcurrentconsolefont
 [GetCurrentConsoleFontEx]:          https://docs.microsoft.com/en-us/windows/console/getcurrentconsolefontex
@@ -135,7 +135,7 @@
 [SetConsoleScreenBufferInfoEx]:     https://docs.microsoft.com/en-us/windows/console/setconsolescreenbufferinfoex
 [SetConsoleScreenBufferSize]:       https://docs.microsoft.com/en-us/windows/console/setconsolescreenbuffersize
 [SetConsoleTextAttribute]:          https://docs.microsoft.com/en-us/windows/console/setconsoletextattribute
-[SetConsoleTitle]:                  https://docs.microsoft.com/en-us/windows/console/setconsoletitle
+[SetConsoleTitleW]:                 https://docs.microsoft.com/en-us/windows/console/setconsoletitle
 [SetConsoleWindowInfo]:             https://docs.microsoft.com/en-us/windows/console/setconsolewindowinfo
 [SetCurrentConsoleFontEx]:          https://docs.microsoft.com/en-us/windows/console/setcurrentconsolefontex
 [SetStdHandle]:                     https://docs.microsoft.com/en-us/windows/console/setstdhandle
@@ -146,15 +146,21 @@
 [WriteConsoleOutputCharacter]:      https://docs.microsoft.com/en-us/windows/console/writeconsoleoutputcharacter
 
 [COORD]:                                https://docs.microsoft.com/en-us/windows/console/coord-str
+[SMALL_RECT]:                           https://docs.microsoft.com/en-us/windows/console/small-rect-str
+
 [SHORT]:                                https://docs.rs/winapi/0.3.9/winapi/shared/minwindef/type.SHORT.html
 [WORD]:                                 https://docs.rs/winapi/0.3.9/winapi/shared/minwindef/type.WORD.html
 [DWORD]:                                https://docs.rs/winapi/0.3.9/winapi/shared/minwindef/type.DWORD.html
 [UINT]:                                 https://docs.rs/winapi/0.3.9/winapi/shared/minwindef/type.UINT.html
+[HWND]:                                 https://docs.rs/winapi/0.3.9/winapi/shared/windef/type.HWND.html
 
+[OsString]:                             https://doc.rust-lang.org/std/ffi/struct.OsString.html
 [stdin]:                                https://doc.rust-lang.org/std/io/fn.stdin.html
 [stdout]:                               https://doc.rust-lang.org/std/io/fn.stdout.html
 [as_raw_handle]:                        https://doc.rust-lang.org/std/os/windows/io/trait.AsRawHandle.html#tymethod.as_raw_handle
 [std::os::windows::io::AsRawHandle]:    https://doc.rust-lang.org/std/os/windows/io/trait.AsRawHandle.html
+
+[wchar::whcz!]:                         https://docs.rs/wchar/0.11.0/wchar/macro.wchz.html
 
 [x]:    https://img.shields.io/badge/impl-✗-red
 [?]:    https://img.shields.io/badge/impl-%3f-yellow

@@ -18,6 +18,7 @@ winapi.features     = [
     # shared
     "minwindef",
     "ntdef",
+    "windef",
     "winerror",
 
     # um

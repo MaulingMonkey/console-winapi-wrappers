@@ -13,3 +13,4 @@ mod font;       pub use font::*;
 mod handles;    pub use handles::*;
 mod io;         pub use io::*;
 mod mode;       pub use mode::*;
+mod window;     pub use window::*;
