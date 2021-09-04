@@ -18,7 +18,7 @@
 | <code>[CreatePseudoConsole]\(...);</code>                                                         | ...
 | <code>[CreateConsoleScreenBuffer]\(...);</code>                                                   | <code>[ConsoleScreenBuffer]::[new](ConsoleScreenBuffer::new)()?;</code>
 | <code>[FillConsoleOutputAttribute]\(stdout, green, 1, COORD { X: 2, Y: 3 }, &mut out_n);</code>   | <code>out_n = [fill_console_output_attribute]\(&mut [stdout]\(), green, 1, (2,3))?;</code>
-| <code>[FillConsoleOutputCharacter]\(stdout, '!', 1, COORD { X: 2, Y: 3 }, &mut out_n);</code>     | <code>out_n = [fill_console_output_character]\(&mut [stdout]\(), '!', 1, (2,3))?;</code>
+| <code>[FillConsoleOutputCharacter]\(stdout, `'!'`, 1, COORD { X: 2, Y: 3 }, &mut out_n);</code>     | <code>out_n = [fill_console_output_character]\(&mut [stdout]\(), `'!'`, 1, (2,3))?;</code>
 | <code>[FlushConsoleInputBuffer]\(stdin);</code>                                                   | <code>[flush_console_input_buffer]\(&mut stdin())?;</code>
 | <code>[FreeConsole]\();</code>                                                                    | <code>[free_console]\()?;</code>
 | <code>[GenerateConsoleCtrlEvent]\(...);</code>                                                    | ...
