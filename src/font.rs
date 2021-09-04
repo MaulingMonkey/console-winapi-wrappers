@@ -15,6 +15,19 @@ use std::mem::{size_of_val, zeroed};
 ///
 /// * $5 says `nfont` is missing bounds checks or overflows on some version of Windows, Wine, or ReactOS.
 ///
+/// ### Example
+/// ```
+/// # use maulingmonkey_console_winapi_wrappers::*;
+/// # use std::io::{self, *};
+/// # let _ = (|| -> io::Result<()> {
+/// let font = get_current_console_font(&stdout(), false)?;
+/// let font_size = unsafe { get_console_font_size(&stdout(), font.nFont)? };
+/// assert_eq!(font_size.X, font.dwFontSize.X);
+/// assert_eq!(font_size.Y, font.dwFontSize.Y);
+/// # Ok(())
+/// # })();
+/// ```
+///
 /// [GetConsoleFontSize]: https://docs.microsoft.com/en-us/windows/console/getconsolefontsize
 pub unsafe fn get_console_font_size(console_output: &impl AsConsoleOutputHandle, nfont: DWORD) -> io::Result<COORD> {
     match unsafe { GetConsoleFontSize(console_output.as_raw_handle().cast(), nfont) } {
@@ -25,6 +38,16 @@ pub unsafe fn get_console_font_size(console_output: &impl AsConsoleOutputHandle,
 
 /// \[[GetCurrentConsoleFont]\] Retrieves information about the current console font.
 ///
+/// ### Example
+/// ```
+/// # use maulingmonkey_console_winapi_wrappers::*;
+/// # use std::io::{self, *};
+/// # let _ = (|| -> io::Result<()> {
+/// let info = get_current_console_font(&stdout(), false)?;
+/// # Ok(())
+/// # })();
+/// ```
+///
 /// [GetCurrentConsoleFont]:    https://docs.microsoft.com/en-us/windows/console/getcurrentconsolefont
 pub fn get_current_console_font(console_output: &impl AsConsoleOutputHandle, maximum_window: bool) -> io::Result<CONSOLE_FONT_INFO> {
     let mut info : CONSOLE_FONT_INFO = unsafe { zeroed() };
@@ -33,6 +56,16 @@ pub fn get_current_console_font(console_output: &impl AsConsoleOutputHandle, max
 }
 
 /// \[[GetCurrentConsoleFontEx]\] Retrieves extended information about the current console font.
+///
+/// ### Example
+/// ```
+/// # use maulingmonkey_console_winapi_wrappers::*;
+/// # use std::io::{self, *};
+/// # let _ = (|| -> io::Result<()> {
+/// let info = get_current_console_font_ex(&stdout(), false)?;
+/// # Ok(())
+/// # })();
+/// ```
 ///
 /// [GetCurrentConsoleFontEx]:  https://docs.microsoft.com/en-us/windows/console/getcurrentconsolefontex
 pub fn get_current_console_font_ex(console_output: &impl AsConsoleOutputHandle, maximum_window: bool) -> io::Result<CONSOLE_FONT_INFOEX> {
