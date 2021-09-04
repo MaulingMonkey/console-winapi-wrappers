@@ -335,13 +335,13 @@ pub fn read_console_input<'i>(console_input: &mut impl AsConsoleInputHandle, buf
 /// use winapi::um::wincontypes::{CHAR_INFO, SMALL_RECT};
 /// let mut buffer = [CHAR_INFO::default(); 80 * 25];
 /// let mut region = SMALL_RECT { Left: 0, Right: 80, Top: 0, Bottom: 25 };
-/// read_console_output(&mut stdout(), &mut buffer, (80,25), (0,0), &mut region)?;
+/// read_console_output(&stdout(), &mut buffer, (80,25), (0,0), &mut region)?;
 /// # Ok(())
 /// # })();
 /// ```
 ///
 /// [ReadConsoleOutputW]:   https://docs.microsoft.com/en-us/windows/console/readconsoleoutput
-pub fn read_console_output(console_output: &mut impl AsConsoleOutputHandle, buffer: &mut [CHAR_INFO], buffer_size: impl IntoCoord, buffer_coord: impl IntoCoord, read_region: &mut SMALL_RECT) -> io::Result<()> {
+pub fn read_console_output(console_output: &impl AsConsoleOutputHandle, buffer: &mut [CHAR_INFO], buffer_size: impl IntoCoord, buffer_coord: impl IntoCoord, read_region: &mut SMALL_RECT) -> io::Result<()> {
     let console_output = console_output.as_raw_handle().cast();
     let buffer_size = buffer_size.into_coord();
     let buffer_coord = buffer_coord.into_coord();

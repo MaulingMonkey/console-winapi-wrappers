@@ -51,9 +51,9 @@
 | <code>[PeekConsoleInput]\(stdin, ...);</code>                                                     | <code>[peek_console_input]\(&mut [stdin]\(), ...)?; <br> [peek_console_input_one]\(&mut [stdin]\(), ...)?;</code>
 | <code>[ReadConsole]\(stdin, ...);</code>                                                          | <code>[read_console]\(&mut [stdin]\(), ...)?;</code>
 | <code>[ReadConsoleInput]\(stdin, ...);</code>                                                     | <code>[read_console_input]\(&mut [stdin]\(), ...)?;</code>
-| <code>[ReadConsoleOutput]\(stdout, ...);</code>                                                   | <code>[read_console_output]\(&mut [stdout]\(), ...)?;</code>
-| <code>[ReadConsoleOutputAttribute]\(stdout, ...);</code>                                          | <code>[read_console_output_attribute]\(&mut [stdout]\(), ...)?;</code>
-| <code>[ReadConsoleOutputCharacter]\(stdout, ...);</code>                                          | <code>[read_console_output_character]\(&mut [stdout]\(), ...)?;</code>
+| <code>[ReadConsoleOutput]\(stdout, ...);</code>                                                   | <code>[read_console_output]\(&[stdout]\(), ...)?;</code>
+| <code>[ReadConsoleOutputAttribute]\(stdout, ...);</code>                                          | <code>[read_console_output_attribute]\(&[stdout]\(), ...)?;</code>
+| <code>[ReadConsoleOutputCharacter]\(stdout, ...);</code>                                          | <code>[read_console_output_character]\(&[stdout]\(), ...)?;</code>
 | <code>[ResizePseudoConsole]\(...);</code>                                                         | ...
 | <code>[ScrollConsoleScreenBuffer]\(...);</code>                                                   | ...
 | <code>[SetConsoleActiveScreenBuffer]\(stdout);</code>                                             | <code>[set_console_active_screen_buffer]\(&[stdout]\())?;</code>
