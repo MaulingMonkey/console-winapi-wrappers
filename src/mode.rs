@@ -13,7 +13,12 @@ use std::io;
 /// ### Example
 /// ```
 /// # use maulingmonkey_console_winapi_wrappers::*;
-/// let _mode = get_console_mode(&std::io::stdin());
+/// # use std::io::{self, *};
+/// # let _ = (|| -> io::Result<()> {
+/// let input_mode : InputMode = get_console_mode(&std::io::stdin())?;
+/// let output_mode : OutputMode = get_console_mode(&std::io::stdout())?;
+/// # Ok(())
+/// # })();
 /// ```
 ///
 /// ### See Also
@@ -32,9 +37,14 @@ pub fn get_console_mode<CH: AsConsoleHandle>(handle: &CH) -> io::Result<CH::Mode
 /// ### Example
 /// ```
 /// # use maulingmonkey_console_winapi_wrappers::*;
-/// if let Ok(mode) = get_console_mode(&std::io::stdin()) {
-///     set_console_mode(&mut std::io::stdin(), mode | ENABLE_MOUSE_INPUT).unwrap();
-/// }
+/// # use std::io::{self, *};
+/// # let _ = (|| -> io::Result<()> {
+/// # let input_mode : InputMode = get_console_mode(&std::io::stdin())?;
+/// # let output_mode : OutputMode = get_console_mode(&std::io::stdout())?;
+/// set_console_mode(&mut std::io::stdin(), input_mode | ENABLE_MOUSE_INPUT)?;
+/// set_console_mode(&mut std::io::stdout(), output_mode | ENABLE_PROCESSED_OUTPUT)?;
+/// # Ok(())
+/// # })();
 /// ```
 ///
 /// ### See Also
@@ -51,7 +61,12 @@ pub fn set_console_mode<CH: AsConsoleHandle>(handle: &mut CH, mode: CH::Mode) ->
 /// ### Example
 /// ```
 /// # use maulingmonkey_console_winapi_wrappers::*;
-/// let _ = change_console_mode(&mut std::io::stdin(), |mode| mode | ENABLE_MOUSE_INPUT);
+/// # use std::io::{self, *};
+/// # let _ = (|| -> io::Result<()> {
+/// change_console_mode(&mut std::io::stdin(), |mode| mode | ENABLE_MOUSE_INPUT)?;
+/// change_console_mode(&mut std::io::stdout(), |mode| mode | ENABLE_PROCESSED_OUTPUT)?;
+/// # Ok(())
+/// # })();
 /// ```
 ///
 /// ### See Also
