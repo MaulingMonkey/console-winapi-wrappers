@@ -46,7 +46,7 @@
 | <code>[GetLargestConsoleWindowSize]\(...);</code>                                                 | ...
 | <code>let events = [GetNumberOfConsoleInputEvents]\(stdout);</code>                               | <code>let events = [get_number_of_console_input_events]\(&mut [stdout]\())?;</code>
 | <code>let buttons = [GetNumberOfConsoleMouseButtons]\();</code>                                   | <code>let buttons = [get_number_of_console_mouse_buttons]\()?;</code>
-| <code>[GetStdHandle]\(STD_INPUT_HANDLE); <br> [GetStdHandle]\(STD_OUTPUT_HANDLE); <br> [GetStdHandle]\(STD_ERROR_HANDLE);</code> | <code>[std::io::stdin]\().[as_raw_handle]\(); <br> [std::io::stdout]\().[as_raw_handle]\(); <br> [std::io::stderr]\().[as_raw_handle]\(); <br> use [std::os::windows::io::AsRawHandle];</code>
+| <pre>use winapi::um::{processenv, winbase}::*;<br>let h = [GetStdHandle]\(STD_INPUT_HANDLE);<br>let h = [GetStdHandle]\(STD_OUTPUT_HANDLE);<br>let h = [GetStdHandle]\(STD_ERROR_HANDLE);</pre> | <pre>use [std::os::windows::io::AsRawHandle];<br>let h = [std::io::stdin]\().[as_raw_handle]\().cast();<br>let h = [std::io::stdout]\().[as_raw_handle]\().cast();<br>let h = [std::io::stderr]\().[as_raw_handle]\().cast();</pre>
 | <code>[HandlerRoutine]\(...);</code>                                                              | ...
 | <code>[PeekConsoleInput]\(stdin, ...);</code>                                                     | <code>[peek_console_input]\(&mut [stdin]\(), ...)?; <br> [peek_console_input_one]\(&mut [stdin]\(), ...)?;</code>
 | <code>[ReadConsole]\(stdin, ...);</code>                                                          | <code>[read_console]\(&mut [stdin]\(), ...)?;</code>
