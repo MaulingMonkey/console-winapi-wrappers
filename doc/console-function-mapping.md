@@ -30,21 +30,21 @@
 | <code>codepage = [GetConsoleCP]\();</code>                                                        | <code>codepage = [get_console_input_cp]\()?;</code>
 | <code>[GetConsoleCursorInfo]\(stdout, &mut info);</code>                                          | <code>let info = [get_console_cursor_info]\(&[stdout]\())?;</code>
 | <code>[GetConsoleDisplayMode]\(&mut mode);</code>                                                 | <code>let mode = [get_console_display_mode]\()?;</code>
-| <code>let c : [COORD] = [GetConsoleFontSize]\(stdout, 42);</code>                                 | <code>let c : [COORD] = [get_console_font_size]\(&mut [stdout]\(), 42)?;</code>
+| <code>let c : [COORD] = [GetConsoleFontSize]\(stdout, 42);</code>                                 | <code>let c : [COORD] = [get_console_font_size]\(&[stdout]\(), 42)?;</code>
 | <code>[GetConsoleHistoryInfo]\(&mut info);</code>                                                 | <code>let info = [get_console_history_info]\()?;</code>
 | <code>[GetConsoleMode]\(handle, &mut mode);</code>                                                | <code>let mode = [get_console_mode]\(handle)?;</code>
-| <code>[GetConsoleOriginalTitleW]\(title.as_mut_ptr(); title.len() as _);</code>                                                     | <code>let title : [OsString] = [get_console_original_title]\()?;</code>
+| <code>[GetConsoleOriginalTitleW]\(title.as_mut_ptr(); title.len() as _);</code>                   | <code>let title : [OsString] = [get_console_original_title]\()?;</code>
 | <code>codepage = [GetConsoleOutputCP]\();</code>                                                  | <code>codepage = [get_console_output_cp]\()?;</code>
 | <code>[GetConsoleProcessList]\(...);</code>                                                       | ...
-| <code>[GetConsoleScreenBufferInfo]\(stdout, &mut info);</code>                                    | <code>let info = [get_console_screen_buffer_info]\(&mut [stdout]\())?;</code>
-| <code>[GetConsoleScreenBufferInfoEx]\(stdout, &mut info);</code>                                  | <code>let info = [get_console_screen_buffer_info_ex]\(&mut [stdout]\())?;</code>
+| <code>[GetConsoleScreenBufferInfo]\(stdout, &mut info);</code>                                    | <code>let info = [get_console_screen_buffer_info]\(&[stdout]\())?;</code>
+| <code>[GetConsoleScreenBufferInfoEx]\(stdout, &mut info);</code>                                  | <code>let info = [get_console_screen_buffer_info_ex]\(&[stdout]\())?;</code>
 | <code>[GetConsoleSelectionInfo]\(&mut info);</code>                                               | <code>let info = [get_console_selection_info]\()?;</code>
-| <code>[GetConsoleTitleW]\(title.as_mut_ptr(), title.len() as _);</code>                            | <code>let title : [OsString] = [get_console_title]\()?;</code>
+| <code>[GetConsoleTitleW]\(title.as_mut_ptr(), title.len() as _);</code>                           | <code>let title : [OsString] = [get_console_title]\()?;</code>
 | <code>let hwnd : [HWND] = [GetConsoleWindow]\();</code>                                           | <code>let hwnd : [HWND] = [get_console_window]\()?;</code>
-| <code>[GetCurrentConsoleFont]\(stdout, &mut info);</code>                                         | <code>let info = [get_current_console_font]\(&mut [stdout]\())?;</code>
-| <code>[GetCurrentConsoleFontEx]\(stdout, &mut info);</code>                                       | <code>let info = [get_current_console_font_ex]\(&mut [stdout]\())?;</code>
-| <code>[GetLargestConsoleWindowSize]\(stdout);</code>                                              | <code>let s : [COORD] = [get_largest_console_window_size]\(&[stdout]\())?;</code>
-| <code>let events = [GetNumberOfConsoleInputEvents]\(stdout);</code>                               | <code>let events = [get_number_of_console_input_events]\(&mut [stdout]\())?;</code>
+| <code>[GetCurrentConsoleFont]\(stdout, FALSE, &mut info);</code>                                  | <code>let info = [get_current_console_font]\(&[stdout]\(), false)?;</code>
+| <code>[GetCurrentConsoleFontEx]\(stdout, FALSE, &mut info);</code>                                | <code>let info = [get_current_console_font_ex]\(&[stdout]\(), false)?;</code>
+| <code>let s : [COORD] = [GetLargestConsoleWindowSize]\(stdout);</code>                            | <code>let s : [COORD] = [get_largest_console_window_size]\(&[stdout]\())?;</code>
+| <code>let events = [GetNumberOfConsoleInputEvents]\(stdout);</code>                               | <code>let events = [get_number_of_console_input_events]\(&[stdout]\())?;</code>
 | <code>let buttons = [GetNumberOfConsoleMouseButtons]\();</code>                                   | <code>let buttons = [get_number_of_console_mouse_buttons]\()?;</code>
 | <pre>use winapi::um::{processenv, winbase}::*;<br>let h = [GetStdHandle]\(STD_INPUT_HANDLE);<br>let h = [GetStdHandle]\(STD_OUTPUT_HANDLE);<br>let h = [GetStdHandle]\(STD_ERROR_HANDLE);</pre> | <pre>use [std::os::windows::io::AsRawHandle];<br>let h = [std::io::stdin]\().[as_raw_handle]\().cast();<br>let h = [std::io::stdout]\().[as_raw_handle]\().cast();<br>let h = [std::io::stderr]\().[as_raw_handle]\().cast();</pre>
 | <code>[HandlerRoutine]\(...);</code>                                                              | ...
@@ -56,7 +56,7 @@
 | <code>[ReadConsoleOutputCharacter]\(stdout, ...);</code>                                          | <code>[read_console_output_character]\(&mut [stdout]\(), ...)?;</code>
 | <code>[ResizePseudoConsole]\(...);</code>                                                         | ...
 | <code>[ScrollConsoleScreenBuffer]\(...);</code>                                                   | ...
-| <code>[SetConsoleActiveScreenBuffer]\(stdout);</code>                                             | <code>[set_console_active_screen_buffer]\(&mut [stdout]\())?;</code>
+| <code>[SetConsoleActiveScreenBuffer]\(stdout);</code>                                             | <code>[set_console_active_screen_buffer]\(&[stdout]\())?;</code>
 | <code>[SetConsoleCP]\(437);</code>                                                                | <code>[set_console_input_cp]\(437)?; <br> [set_console_input_cp]\([CodePage]::[IBM437](CodePage::IBM437))?; <br> [set_console_input_cp]\([CodePage]::from(437))?; <br> let _s = [InputCodePageScope]::[new](InputCodePageScope::new)([CodePage]::[IBM437](CodePage::IBM437))?;</code>
 | <code>[SetConsoleCtrlHandler]\(...);</code>                                                       | ...
 | <code>[SetConsoleCursorInfo]\(stdout, ...);</code>                                                | <code>[set_console_cursor_info]\(&mut [stdout]\(), ...)?;</code>
