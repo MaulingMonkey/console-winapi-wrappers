@@ -28,7 +28,7 @@
 | <code>[GetConsoleAliasExes]\(...);</code>                                                         | ...
 | <code>[GetConsoleAliasExesLength]\(...);</code>                                                   | ...
 | <code>codepage = [GetConsoleCP]\();</code>                                                        | <code>codepage = [get_console_input_cp]\()?;</code>
-| <code>[GetConsoleCursorInfo]\(stdout, &mut info);</code>                                          | <code>let info = [get_console_cursor_info]\(&stdout)?;</code>
+| <code>[GetConsoleCursorInfo]\(stdout, &mut info);</code>                                          | <code>let info = [get_console_cursor_info]\(&[stdout]\())?;</code>
 | <code>[GetConsoleDisplayMode]\(&mut mode);</code>                                                 | <code>let mode = [get_console_display_mode]\()?;</code>
 | <code>let c : [COORD] = [GetConsoleFontSize]\(stdout, 42);</code>                                 | <code>let c : [COORD] = [get_console_font_size]\(&mut [stdout]\(), 42)?;</code>
 | <code>[GetConsoleHistoryInfo]\(&mut info);</code>                                                 | <code>let info = [get_console_history_info]\()?;</code>
