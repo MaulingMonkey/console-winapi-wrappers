@@ -6,11 +6,12 @@
 
 | C/C++/Winapi                                                                                      | Rust |
 | ------------------------------------------------------------------------------------------------- | ---- |
-| <code>let green : [WORD] = [FOREGROUND_GREEN](winapi::um::wincon::FOREGROUND_GREEN);</code>       | <code>let green : [Attributes] = [FOREGROUND_GREEN];</code>
+| <code>let green : [WORD] = [FOREGROUND_GREEN](winapi::um::wincon::FOREGROUND_GREEN);</code>       | <code>let green = [Attributes]::[FOREGROUND_GREEN](Attributes::FOREGROUND_GREEN);</code>
 | <code>let mut out_n : [DWORD] = 0;</code>                                                         | <code>let mut out_n : [DWORD];</code>
 | <code>let mut codepage : [UINT] = 437;</code>                                                     | <code>let mut codepage : [CodePage] = [CodePage::IBM437];</code>
 | |
-| <code>[AddConsoleAlias]\(...);</code>                                                             | ...
+| <pre>[AddConsoleAlias]\(<br>    [wchz!]\(`"alias"`).as_ptr() as *mut _,<br>    [wchz!]\(`"value"`).as_ptr() as *mut _,<br>    [wchz!]\(`"cmd.exe"`).as_ptr() as *mut _<br>);</pre> | <pre>[add_console_alias]`("alias", "value", "cmd.exe")?;`</pre>
+| <pre>[AddConsoleAlias]\(<br>    [wchz!]\(`"alias"`).as_ptr() as *mut _,<br>    NULL,                                  <br>    [wchz!]\(`"cmd.exe"`).as_ptr() as *mut _<br>);</pre> | <pre>[clear_console_alias]`("alias", (), "cmd.exe")?;`</pre>
 | <code>[AllocConsole]\();</code>                                                                   | <code>[alloc_console]\()?;</code>
 | <code>[AttachConsole]\(42);</code>                                                                | <code>[attach_console]\(42)?;</code>
 | <code>[AttachConsole]\(ATTACH_PARENT_PROCESS);</code>                                             | <code>[attach_console]\(ATTACH_PARENT_PROCESS)?;</code> <br> <code>[attach_console_parent_process]\()?;</code>
@@ -22,11 +23,11 @@
 | <code>[FlushConsoleInputBuffer]\(stdin);</code>                                                   | <code>[flush_console_input_buffer]\(&mut stdin())?;</code>
 | <code>[FreeConsole]\();</code>                                                                    | <code>[free_console]\()?;</code>
 | <code>[GenerateConsoleCtrlEvent]\(...);</code>                                                    | ...
-| <code>[GetConsoleAlias]\(...);</code>                                                             | ...
-| <code>[GetConsoleAliases]\(...);</code>                                                           | ...
-| <code>[GetConsoleAliasesLength]\(...);</code>                                                     | ...
-| <code>[GetConsoleAliasExes]\(...);</code>                                                         | ...
-| <code>[GetConsoleAliasExesLength]\(...);</code>                                                   | ...
+| <code>[GetConsoleAlias]\(...);</code>                                                             | <code>[get_console_alias]\(...)?;</code>
+| <code>[GetConsoleAliases]\(...);</code>                                                           | <code>[get_console_aliases]\(...)?;</code>
+| <code>[GetConsoleAliasesLength]\(...);</code>                                                     | <code>[get_console_aliases_length]\(...)?;</code>
+| <code>[GetConsoleAliasExes]\(...);</code>                                                         | <code>[get_console_alias_exes]\(...)?;</code>
+| <code>[GetConsoleAliasExesLength]\();</code>                                                      | <code>[get_console_alias_exes_length]\()?;</code>
 | <code>codepage = [GetConsoleCP]\();</code>                                                        | <code>codepage = [get_console_input_cp]\()?;</code>
 | <code>[GetConsoleCursorInfo]\(stdout, &mut info);</code>                                          | <code>let info = [get_console_cursor_info]\(&[stdout]\())?;</code>
 | <code>[GetConsoleDisplayMode]\(&mut mode);</code>                                                 | <code>let mode = [get_console_display_mode]\()?;</code>
@@ -68,7 +69,7 @@
 | <code>[SetConsoleScreenBufferInfoEx]\(...);</code>                                                | ...
 | <code>[SetConsoleScreenBufferSize]\(...);</code>                                                  | ...
 | <code>[SetConsoleTextAttribute]\(stdout, green);</code>                                           | <code>[set_console_text_attribute]\(&mut [stdout]\(), green)?;</code>
-| <code>[SetConsoleTitleW]\([wchar::whcz!](`"new title"`).as_ptr());</code>                         | <code>[set_console_title]\(`"new title"`)?;</code>
+| <code>[SetConsoleTitleW]\([wchz!]\(`"new title"`).as_ptr());</code>                               | <code>[set_console_title]\(`"new title"`)?;</code>
 | <code>[SetConsoleWindowInfo]\(stdout, FALSE, &[SMALL_RECT] { Left: 0, Top: 0, Right: 80, Bottom: 25 });</code> | <code>[set_console_window_info]\(&mut [stdout]\(), false, (0,0) .. (80,25))?;</code>
 | <code>[SetCurrentConsoleFontEx]\(...);</code>                                                     | ...
 | <code>[SetStdHandle]\(...);</code>                                                                | ...
@@ -160,7 +161,7 @@
 [as_raw_handle]:                        https://doc.rust-lang.org/std/os/windows/io/trait.AsRawHandle.html#tymethod.as_raw_handle
 [std::os::windows::io::AsRawHandle]:    https://doc.rust-lang.org/std/os/windows/io/trait.AsRawHandle.html
 
-[wchar::whcz!]:                         https://docs.rs/wchar/0.11.0/wchar/macro.wchz.html
+[wchz!]:                                https://docs.rs/wchar/0.11.0/wchar/macro.wchz.html
 
 [x]:    https://img.shields.io/badge/impl-✗-red
 [?]:    https://img.shields.io/badge/impl-%3f-yellow

@@ -6,6 +6,7 @@
 
 mod _impl;      pub(crate) use _impl::*;
 mod _traits;    pub use _traits::*;
+mod alias;      pub use alias::*;
 mod alloc;      pub use alloc::*;
 mod charattrib; pub use charattrib::*;
 mod codepage;   pub use codepage::*;
