@@ -1,12 +1,14 @@
 use crate::*;
 
 use winapi::shared::winerror::*;
+use winapi::um::errhandlingapi::*;
 use winapi::um::wincon::*;
 
 use std::convert::*;
 use std::ffi::*;
 use std::fmt::{self, Debug, Formatter};
 use std::io;
+use std::mem::size_of_val;
 use std::ops::*;
 use std::os::windows::prelude::*;
 use std::ptr::*;
@@ -75,9 +77,8 @@ pub fn get_console_alias<'t>(source: impl AsRef<OsStr>, target_buffer: &'t mut i
     // none of these are modified, GetConsoleAliasW just has bad const qualifications
     let mut source      = source        .as_ref().encode_wide().chain(Some(0)).collect::<Vec<_>>();
     let mut exe_name    = exe_name      .as_ref().encode_wide().chain(Some(0)).collect::<Vec<_>>();
-    let bytes = unsafe { GetConsoleAliasW(source.as_mut_ptr(), target_buffer.as_mut_ptr(), target_buffer.len() as _, exe_name.as_mut_ptr()) };
-    if bytes == 0 { last_os_error_unless_success()? }
-    Ok(TextRef(&target_buffer[..(bytes/2) as _].strip_suffix(&[0]).ok_or_else(|| io::Error::from_raw_os_error(ERROR_NOT_ENOUGH_MEMORY as _))?))
+    let bytes = wrap_last_error(|| unsafe { GetConsoleAliasW(source.as_mut_ptr(), target_buffer.as_mut_ptr(), size_of_val(target_buffer) as _, exe_name.as_mut_ptr()) })?;
+    Ok(TextRef(&target_buffer[..(bytes/2) as _].strip_suffix(&[0]).ok_or_else(|| io::Error::from_raw_os_error(ERROR_INSUFFICIENT_BUFFER as _))?))
 }
 
 
@@ -126,8 +127,7 @@ pub fn get_console_aliases<'t>(alias_buffer: &'t mut impl AsMut<[u16]>, exe_name
     let alias_buffer    = alias_buffer.as_mut();
     // none of these are modified, GetConsoleAliasW just has bad const qualifications
     let mut exe_name    = exe_name  .as_ref().encode_wide().chain(Some(0)).collect::<Vec<_>>();
-    let bytes = unsafe { GetConsoleAliasesW(alias_buffer.as_mut_ptr(), alias_buffer.len() as _, exe_name.as_mut_ptr()) };
-    if bytes == 0 { last_os_error_unless_success()? }
+    let bytes = wrap_last_error(|| unsafe { GetConsoleAliasesW(alias_buffer.as_mut_ptr(), size_of_val(alias_buffer) as _, exe_name.as_mut_ptr()) })?;
     Ok(TextNsvRef(&alias_buffer[..(bytes/2) as _]))
 }
 
@@ -161,8 +161,7 @@ pub fn get_console_aliases_length(exe_name: impl AsRef<OsStr>) -> LengthBytesOrW
 /// [GetConsoleAliasExesW]: https://docs.microsoft.com/en-us/windows/console/getconsolealiasexes
 pub fn get_console_alias_exes(exe_name_buffer: &mut impl AsMut<[u16]>) -> io::Result<TextNsvRef> {
     let exe_name_buffer = exe_name_buffer.as_mut();
-    let bytes = unsafe { GetConsoleAliasExesW(exe_name_buffer.as_mut_ptr(), exe_name_buffer.len() as _) };
-    if bytes == 0 { last_os_error_unless_success()? }
+    let bytes = wrap_last_error(|| unsafe { GetConsoleAliasExesW(exe_name_buffer.as_mut_ptr(), size_of_val(exe_name_buffer) as _) })?;
     Ok(TextNsvRef(&exe_name_buffer[..(bytes/2) as _]))
 }
 
@@ -253,47 +252,59 @@ impl LengthBytesOrWchars {
     let exe = "maulingmonkey-console-winapi-wrappers-test.exe";
     let bad_exe = "maulingmonkey-console-winapi-wrappers-bad.exe"; // never set
 
-    clear_console_alias("test-alias1", (), exe).unwrap();
-    clear_console_alias("test-alias1", (), exe).unwrap(); // no error despite removing a removed alias
-    clear_console_alias("test-never",  (), exe).unwrap(); // no error despite removing a never-existing alias
-    clear_console_alias("test-alias2", (), exe).unwrap();
-    clear_console_alias("test=equal", (), exe).unwrap(); // keys containins `=`s are super gross
+    set_err_1(); clear_console_alias("test-alias1", (), exe).unwrap();
+    set_err_1(); clear_console_alias("test-alias1", (), exe).unwrap(); // no error despite removing a removed alias
+    set_err_1(); clear_console_alias("test-never",  (), exe).unwrap(); // no error despite removing a never-existing alias
+    set_err_1(); clear_console_alias("test-alias2", (), exe).unwrap();
+    set_err_1(); clear_console_alias("test=equal", (), exe).unwrap(); // keys containins `=`s are super gross
 
-    add_console_alias("test-alias1", "old", exe).unwrap();
-    add_console_alias("test-alias1", "alias1target", exe).unwrap(); // no error despite overwriting an alias
-    add_console_alias("test-alias2", "alias2target", exe).unwrap();
-    add_console_alias("test=equal", "value=value", exe).unwrap(); // keys containins `=`s are super gross
+    set_err_1(); add_console_alias("test-alias1", "old", exe).unwrap();
+    set_err_1(); add_console_alias("test-alias1", "alias1target", exe).unwrap(); // no error despite overwriting an alias
+    set_err_1(); add_console_alias("test-alias2", "alias2target", exe).unwrap();
+    set_err_1(); add_console_alias("test=equal", "value=value", exe).unwrap(); // keys containins `=`s are super gross
 
-    add_console_alias("test-removed", "temp", exe).unwrap();
-    clear_console_alias("test-removed", (), exe).unwrap();
+    set_err_1(); add_console_alias("test-removed", "temp", exe).unwrap();
+    set_err_1(); clear_console_alias("test-removed", (), exe).unwrap();
 
 
 
+    set_err_1();
     let err = get_console_alias("test-never",  &mut [0u16; 512], exe).unwrap_err();
     assert_eq!(err.raw_os_error(), Some(31));
     assert_eq!(err.raw_os_error(), Some(ERROR_GEN_FAILURE as _));
     assert_eq!(err.kind(), io::ErrorKind::Other);
 
+    set_err_1();
     let err = get_console_alias("test-removed",  &mut [0u16; 512], exe).unwrap_err();
     assert_eq!(err.raw_os_error(), Some(31));
     assert_eq!(err.raw_os_error(), Some(ERROR_GEN_FAILURE as _));
     assert_eq!(err.kind(), io::ErrorKind::Other);
 
-    let alias1 = get_console_alias("test-alias1", &mut [0u16; 512], exe).unwrap().to_os_string();
+    set_err_1();
+    let alias1 = get_console_alias("test-alias1", &mut [0u16; b"alias1target\0".len()], exe).unwrap().to_os_string();
     assert_eq!(alias1, "alias1target");
 
+    set_err_1();
+    let err = get_console_alias("test-alias1", &mut [0u16; b"alias1target".len()], exe).unwrap_err();
+    assert_eq!(err.raw_os_error(), Some(122));
+    assert_eq!(err.raw_os_error(), Some(ERROR_INSUFFICIENT_BUFFER as _));
+    assert_eq!(err.kind(), io::ErrorKind::Other);
+
+    set_err_1();
     let alias2 = get_console_alias("test-alias2", &mut [0u16; 512], exe).unwrap().to_os_string();
     assert_eq!(alias2, "alias2target");
 
+    set_err_1();
     let equal = get_console_alias("test=equal", &mut [0u16; 512], exe).unwrap().to_os_string();
     assert_eq!(equal, "value=value");
 
-    get_console_alias("test", &mut [0u16; 512], exe).unwrap_err();
-    get_console_alias("test=equal", &mut [0u16; 512], exe).unwrap();
-    get_console_alias("test=equal=value", &mut [0u16; 512], exe).unwrap_err();
+    set_err_1(); get_console_alias("test", &mut [0u16; 512], exe).unwrap_err();
+    set_err_1(); get_console_alias("test=equal", &mut [0u16; 512], exe).unwrap();
+    set_err_1(); get_console_alias("test=equal=value", &mut [0u16; 512], exe).unwrap_err();
 
 
 
+    set_err_1();
     let mut aliases = [0u16; 512];
     let mut aliases = get_console_aliases(&mut aliases, exe).unwrap().collect::<Vec<_>>();
     aliases.sort();
@@ -302,27 +313,46 @@ impl LengthBytesOrWchars {
     assert!(aliases[1].as_wchars() == wch!("test-alias2=alias2target"));
     assert!(aliases[2].as_wchars() == wch!("test=equal=value=value"));
 
+    set_err_1();
     assert_eq!(get_console_aliases_length(exe).wchars(), aliases.iter().map(|a| a.len()+1).sum());
 
+    set_err_1();
     let mut exes = [0u16; 512];
     let exes = get_console_alias_exes(&mut exes).unwrap().collect::<Vec<_>>();
     assert!(exes.contains(&TextRef(wch!("maulingmonkey-console-winapi-wrappers-test.exe"))));
 
-    clear_console_alias("test-alias1", (), exe).unwrap();
-    clear_console_alias("test-alias2", (), exe).unwrap();
-    clear_console_alias("test=equal",  (), exe).unwrap();
+    set_err_1(); clear_console_alias("test-alias1", (), exe).unwrap();
+    set_err_1(); clear_console_alias("test-alias2", (), exe).unwrap();
+    set_err_1(); clear_console_alias("test=equal",  (), exe).unwrap();
 
-    // error if all aliases removed
-    let err = get_console_aliases(&mut [0u16; 512], exe).unwrap_err();
-    assert_eq!(err.raw_os_error(), Some(31));
-    assert_eq!(err.raw_os_error(), Some(ERROR_GEN_FAILURE as _));
-    assert_eq!(err.kind(), io::ErrorKind::Other);
+    set_err_1(); assert!(get_console_aliases(&mut [0u16; 512], exe).unwrap().collect::<Vec<_>>().is_empty());
+    set_err_1(); assert!(get_console_aliases(&mut [0u16; 512], bad_exe).unwrap().collect::<Vec<_>>().is_empty());
 
-    // error if no aliases ever present
-    let err = get_console_aliases(&mut [0u16; 512], bad_exe).unwrap_err();
-    assert_eq!(err.raw_os_error(), Some(31));
-    assert_eq!(err.raw_os_error(), Some(ERROR_GEN_FAILURE as _));
-    assert_eq!(err.kind(), io::ErrorKind::Other);
+    fn set_err_1() { unsafe { SetLastError(1) }; }
+}
+
+/// Workaround errata in several console functions:
+///
+/// *   [`GetConsoleAlias`]
+/// *   [`GetConsoleAliases`]
+/// *   [`GetConsoleAliasExes`]
+///
+/// These functions are **mistakenly** documented as returning zero on failure, nonzero (number of bytes read out) on success.
+/// However, in the case of an insufficiently large buffer, they return **nonzero** as if succeeding - or more
+/// specifically, they return the size of the too-small buffer - without populating the contents of the buffer at all.
+///
+/// Additionally, merely checking the last set error is insufficient, since these functions will not *clear* the last
+/// set error should the function succeed.  As such, this function:
+///
+/// 1.  Clears the last set error before calling `f()`, such that it can be reliably queried.
+/// 2.  Checks the last set error after calling `f()`, regardless of the function's return value.
+///
+/// Anything other than [`ERROR_SUCCESS`] is converted into an error.
+fn wrap_last_error<R>(f: impl FnOnce() -> R) -> io::Result<R> {
+    unsafe { SetLastError(0) };
+    let r = f();
+    last_os_error_unless_success()?;
+    Ok(r)
 }
 
 fn last_os_error_unless_success() -> io::Result<()> {

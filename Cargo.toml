@@ -23,6 +23,7 @@ winapi.features     = [
 
     # um
     "consoleapi",
+    "errhandlingapi",
     "handleapi",
     "processthreadsapi",
     "wincon",
