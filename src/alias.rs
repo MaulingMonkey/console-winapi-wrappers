@@ -78,6 +78,43 @@ pub fn get_console_alias<'t>(source: impl AsRef<OsStr>, target_buffer: &'t mut i
     Ok(TextRef(strip0(&target_buffer[..(bytes/2) as _])))
 }
 
+/// \[[GetConsoleAliasW]\] Retrieves the text for the specified console alias and executable.
+///
+/// ### Example
+/// ```
+/// # use maulingmonkey_console_winapi_wrappers::*;
+/// # use std::ffi::*;
+/// # use std::os::windows::prelude::*;
+/// # let _ = (|| -> std::io::Result<()> {
+/// let alias : OsString = get_console_alias_os("test", "cmd.exe")?;
+/// # Ok(())
+/// # })();
+/// ```
+///
+/// [GetConsoleAliasW]: https://docs.microsoft.com/en-us/windows/console/getconsolealias
+pub fn get_console_alias_os(source: impl AsRef<OsStr>, exe_name: impl AsRef<OsStr>) -> io::Result<OsString> {
+    let mut target_buffer = [0u16; 512];
+    let mut source      = widen0(source     ); // unmodified, GetConsoleAliasW just has bad const qualifications
+    let mut exe_name    = widen0(exe_name   ); // unmodified, GetConsoleAliasW just has bad const qualifications
+
+    match wrap_last_error(|| unsafe { GetConsoleAliasW(source.as_mut_ptr(), target_buffer.as_mut_ptr(), size_of_val(&target_buffer) as _, exe_name.as_mut_ptr()) }) {
+        Ok(bytes) => return Ok(wide0_to_os(&target_buffer[..(bytes/2) as _])),
+        Err(err) if err.raw_os_error() == Some(ERROR_INSUFFICIENT_BUFFER as _) => {},
+        Err(err) => return Err(err),
+    }
+
+    let mut target_buffer = vec![0u16; 0];
+    loop {
+        target_buffer.resize(target_buffer.capacity(), 0);
+        match wrap_last_error(|| unsafe { GetConsoleAliasW(source.as_mut_ptr(), target_buffer.as_mut_ptr(), size_of_val(&target_buffer) as _, exe_name.as_mut_ptr()) }) {
+            Ok(bytes) => return Ok(wide0_to_os(&target_buffer[..(bytes/2) as _])),
+            Err(err) if err.raw_os_error() == Some(ERROR_INSUFFICIENT_BUFFER as _) => {},
+            Err(err) => return Err(err),
+        }
+        target_buffer.push(0);
+    }
+}
+
 
 
 /// \[[GetConsoleAliasesW]\] Retrieves all defined console aliases for the specified executable.
@@ -296,6 +333,36 @@ impl LengthBytesOrWchars {
     set_err_1(); get_console_alias("test", &mut [0u16; 512], exe).unwrap_err();
     set_err_1(); get_console_alias("test=equal", &mut [0u16; 512], exe).unwrap();
     set_err_1(); get_console_alias("test=equal=value", &mut [0u16; 512], exe).unwrap_err();
+
+
+
+    set_err_1();
+    let err = get_console_alias_os("test-never", exe).unwrap_err();
+    assert_eq!(err.raw_os_error(), Some(31));
+    assert_eq!(err.raw_os_error(), Some(ERROR_GEN_FAILURE as _));
+    assert_eq!(err.kind(), io::ErrorKind::Other);
+
+    set_err_1();
+    let err = get_console_alias_os("test-removed", exe).unwrap_err();
+    assert_eq!(err.raw_os_error(), Some(31));
+    assert_eq!(err.raw_os_error(), Some(ERROR_GEN_FAILURE as _));
+    assert_eq!(err.kind(), io::ErrorKind::Other);
+
+    set_err_1();
+    let alias1 = get_console_alias_os("test-alias1", exe).unwrap();
+    assert_eq!(alias1, "alias1target");
+
+    set_err_1();
+    let alias2 = get_console_alias_os("test-alias2", exe).unwrap().to_os_string();
+    assert_eq!(alias2, "alias2target");
+
+    set_err_1();
+    let equal = get_console_alias_os("test=equal", exe).unwrap().to_os_string();
+    assert_eq!(equal, "value=value");
+
+    set_err_1(); get_console_alias_os("test", exe).unwrap_err();
+    set_err_1(); get_console_alias_os("test=equal", exe).unwrap();
+    set_err_1(); get_console_alias_os("test=equal=value", exe).unwrap_err();
 
 
 

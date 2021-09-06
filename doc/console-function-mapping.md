@@ -23,7 +23,7 @@
 | <code>[FlushConsoleInputBuffer]\(stdin);</code>                                                   | <code>[flush_console_input_buffer]\(&mut stdin())?;</code>
 | <code>[FreeConsole]\();</code>                                                                    | <code>[free_console]\()?;</code>
 | <code>[GenerateConsoleCtrlEvent]\(...);</code>                                                    | ...
-| <code>[GetConsoleAlias]\(...);</code>                                                             | <code>[get_console_alias]\(...)?;</code>
+| <code>[GetConsoleAlias]\(...);</code>                                                             | <code>[get_console_alias]\(...)?;<br>[get_console_alias_os]\(...)?;</code>
 | <code>[GetConsoleAliases]\(...);</code>                                                           | <code>[get_console_aliases]\(...)?;</code>
 | <code>[GetConsoleAliasesLength]\(...);</code>                                                     | <code>[get_console_aliases_length]\(...)?;</code>
 | <code>[GetConsoleAliasExes]\(...);</code>                                                         | <code>[get_console_alias_exes]\(...)?;</code>
