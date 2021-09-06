@@ -29,10 +29,9 @@ use std::ptr::*;
 ///
 /// [AddConsoleAliasW]: https://docs.microsoft.com/en-us/windows/console/addconsolealias
 pub fn add_console_alias(source: impl AsRef<OsStr>, target: impl AsRef<OsStr>, exe_name: impl AsRef<OsStr>) -> io::Result<()> {
-    // none of these are modified, AddConsoleAliasW just has bad const qualifications
-    let mut source      = source    .as_ref().encode_wide().chain(Some(0)).collect::<Vec<_>>();
-    let mut target      = target    .as_ref().encode_wide().chain(Some(0)).collect::<Vec<_>>();
-    let mut exe_name    = exe_name  .as_ref().encode_wide().chain(Some(0)).collect::<Vec<_>>();
+    let mut source      = widen0(source     ); // unmodified, AddConsoleAliasW just has bad const qualifications
+    let mut target      = widen0(target     ); // unmodified, AddConsoleAliasW just has bad const qualifications
+    let mut exe_name    = widen0(exe_name   ); // unmodified, AddConsoleAliasW just has bad const qualifications
     succeeded_to_result(unsafe { AddConsoleAliasW(source.as_mut_ptr(), target.as_mut_ptr(), exe_name.as_mut_ptr()) })
 }
 
@@ -50,9 +49,8 @@ pub fn add_console_alias(source: impl AsRef<OsStr>, target: impl AsRef<OsStr>, e
 ///
 /// [AddConsoleAliasW]: https://docs.microsoft.com/en-us/windows/console/addconsolealias
 pub fn clear_console_alias(source: impl AsRef<OsStr>, _target: (), exe_name: impl AsRef<OsStr>) -> io::Result<()> {
-    // none of these are modified, AddConsoleAliasW just has bad const qualifications
-    let mut source      = source    .as_ref().encode_wide().chain(Some(0)).collect::<Vec<_>>();
-    let mut exe_name    = exe_name  .as_ref().encode_wide().chain(Some(0)).collect::<Vec<_>>();
+    let mut source      = widen0(source     ); // unmodified, AddConsoleAliasW just has bad const qualifications
+    let mut exe_name    = widen0(exe_name   ); // unmodified, AddConsoleAliasW just has bad const qualifications
     succeeded_to_result(unsafe { AddConsoleAliasW(source.as_mut_ptr(), null_mut(), exe_name.as_mut_ptr()) })
 }
 
@@ -74,11 +72,10 @@ pub fn clear_console_alias(source: impl AsRef<OsStr>, _target: (), exe_name: imp
 /// [GetConsoleAliasW]: https://docs.microsoft.com/en-us/windows/console/getconsolealias
 pub fn get_console_alias<'t>(source: impl AsRef<OsStr>, target_buffer: &'t mut impl AsMut<[u16]>, exe_name: impl AsRef<OsStr>) -> io::Result<TextRef<'t>> {
     let target_buffer   = target_buffer .as_mut();
-    // none of these are modified, GetConsoleAliasW just has bad const qualifications
-    let mut source      = source        .as_ref().encode_wide().chain(Some(0)).collect::<Vec<_>>();
-    let mut exe_name    = exe_name      .as_ref().encode_wide().chain(Some(0)).collect::<Vec<_>>();
+    let mut source      = widen0(source     ); // unmodified, GetConsoleAliasW just has bad const qualifications
+    let mut exe_name    = widen0(exe_name   ); // unmodified, GetConsoleAliasW just has bad const qualifications
     let bytes = wrap_last_error(|| unsafe { GetConsoleAliasW(source.as_mut_ptr(), target_buffer.as_mut_ptr(), size_of_val(target_buffer) as _, exe_name.as_mut_ptr()) })?;
-    Ok(TextRef(&target_buffer[..(bytes/2) as _].strip_suffix(&[0]).ok_or_else(|| io::Error::from_raw_os_error(ERROR_INSUFFICIENT_BUFFER as _))?))
+    Ok(TextRef(strip0(&target_buffer[..(bytes/2) as _])))
 }
 
 
@@ -125,8 +122,7 @@ pub fn get_console_alias<'t>(source: impl AsRef<OsStr>, target_buffer: &'t mut i
 /// [GetConsoleAliasesW]: https://docs.microsoft.com/en-us/windows/console/getconsolealiases
 pub fn get_console_aliases<'t>(alias_buffer: &'t mut impl AsMut<[u16]>, exe_name: impl AsRef<OsStr>) -> io::Result<TextNsvRef<'t>> {
     let alias_buffer    = alias_buffer.as_mut();
-    // none of these are modified, GetConsoleAliasW just has bad const qualifications
-    let mut exe_name    = exe_name  .as_ref().encode_wide().chain(Some(0)).collect::<Vec<_>>();
+    let mut exe_name    = widen0(exe_name); // unmodified, GetConsoleAliasesW just has bad const qualifications
     let bytes = wrap_last_error(|| unsafe { GetConsoleAliasesW(alias_buffer.as_mut_ptr(), size_of_val(alias_buffer) as _, exe_name.as_mut_ptr()) })?;
     Ok(TextNsvRef(&alias_buffer[..(bytes/2) as _]))
 }
@@ -137,8 +133,7 @@ pub fn get_console_aliases<'t>(alias_buffer: &'t mut impl AsMut<[u16]>, exe_name
 ///
 /// [GetConsoleAliasesLengthW]: https://docs.microsoft.com/en-us/windows/console/getconsolealiaseslength
 pub fn get_console_aliases_length(exe_name: impl AsRef<OsStr>) -> LengthBytesOrWchars {
-    // none of these are modified, GetConsoleAliasesLengthW just has bad const qualifications
-    let mut exe_name = exe_name.as_ref().encode_wide().chain(Some(0)).collect::<Vec<_>>();
+    let mut exe_name = widen0(exe_name); // unmodified, GetConsoleAliasesLengthW just has bad const qualifications
     LengthBytesOrWchars(unsafe { GetConsoleAliasesLengthW(exe_name.as_mut_ptr()) as _ })
 }
 
@@ -361,4 +356,19 @@ fn last_os_error_unless_success() -> io::Result<()> {
         Some(0) => Ok(()),
         _ => Err(err),
     }
+}
+
+/// Remove a final `\0` if present.
+fn strip0(s: &[u16]) -> &[u16] {
+    s.strip_suffix(&[0]).unwrap_or(s)
+}
+
+/// Encode as UTF16 and `\0` terminate
+fn widen0(s: impl AsRef<OsStr>) -> Vec<u16> {
+    s.as_ref().encode_wide().chain(Some(0)).collect()
+}
+
+/// Take a `\0`-terminated, UTF16-ish string, and convert it into an [`OsString`].
+fn wide0_to_os(s: impl AsRef<[u16]>) -> OsString {
+    OsString::from_wide(strip0(s.as_ref()))
 }
