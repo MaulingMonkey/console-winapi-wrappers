@@ -242,7 +242,7 @@ pub fn get_number_of_console_mouse_buttons() -> io::Result<usize> {
 /// # use maulingmonkey_console_winapi_wrappers::*;
 /// # use std::io::{self, *};
 /// # let _ = (|| -> io::Result<()> {
-/// for record in peek_console_input(&stdin(), &mut <[_; 8]>::default())? {
+/// for record in peek_console_input_with(&stdin(), &mut <[_; 8]>::default())? {
 ///     // ...
 /// }
 /// # Ok(())
@@ -250,11 +250,34 @@ pub fn get_number_of_console_mouse_buttons() -> io::Result<usize> {
 /// ```
 ///
 /// [PeekConsoleInput]: https://docs.microsoft.com/en-us/windows/console/peekconsoleinput
-pub fn peek_console_input<'i>(console_input: &impl AsConsoleInputHandle, buffer: &'i mut [INPUT_RECORD]) -> io::Result<&'i [INPUT_RECORD]> {
+pub fn peek_console_input_with<'i>(console_input: &impl AsConsoleInputHandle, buffer: &'i mut [INPUT_RECORD]) -> io::Result<&'i [INPUT_RECORD]> {
     let length : DWORD = buffer.len().try_into().unwrap_or(!0);
     let mut read = 0;
     succeeded_to_result(unsafe { PeekConsoleInputW(console_input.as_raw_handle().cast(), buffer.as_mut_ptr(), length, &mut read) })?;
     Ok(&buffer[.. read as _])
+}
+
+/// \[[PeekConsoleInput]\] Reads data from the specified console input buffer without removing it from the buffer.
+///
+/// ### Example
+/// ```
+/// # use maulingmonkey_console_winapi_wrappers::*;
+/// # use std::io::{self, *};
+/// # let _ = (|| -> io::Result<()> {
+/// for record in peek_console_input(&stdin())? {
+///     // ...
+/// }
+/// # Ok(())
+/// # })();
+/// ```
+///
+/// [PeekConsoleInput]: https://docs.microsoft.com/en-us/windows/console/peekconsoleinput
+pub fn peek_console_input<'i>(console_input: &impl AsConsoleInputHandle) -> io::Result<impl Iterator<Item = INPUT_RECORD>> {
+    const N : usize = 32;
+    let mut buffer : [INPUT_RECORD; N] = unsafe { zeroed() };
+    let mut read = 0;
+    succeeded_to_result(unsafe { PeekConsoleInputW(console_input.as_raw_handle().cast(), buffer.as_mut_ptr(), N as _, &mut read) })?;
+    Ok(std::array::IntoIter::new(buffer).take(read as _))
 }
 
 /// \[[PeekConsoleInput]\] Reads data from the specified console input buffer without removing it from the buffer.
@@ -274,7 +297,7 @@ pub fn peek_console_input<'i>(console_input: &impl AsConsoleInputHandle, buffer:
 /// [PeekConsoleInput]: https://docs.microsoft.com/en-us/windows/console/peekconsoleinput
 pub fn peek_console_input_one(console_input: &impl AsConsoleInputHandle) -> io::Result<Option<INPUT_RECORD>> {
     let mut record : INPUT_RECORD = unsafe { zeroed() };
-    let empty = peek_console_input(console_input, std::slice::from_mut(&mut record))?.is_empty();
+    let empty = peek_console_input_with(console_input, std::slice::from_mut(&mut record))?.is_empty();
     Ok(if empty { None } else { Some(record) })
 }
 
@@ -310,7 +333,7 @@ pub fn read_console<'i>(console_input: &mut impl AsConsoleInputHandle, buffer: &
 /// # use maulingmonkey_console_winapi_wrappers::*;
 /// # use std::io::{self, *};
 /// # let _ = (|| -> io::Result<()> {
-/// for record in read_console_input(&mut stdin(), &mut <[_; 8]>::default())? {
+/// for record in read_console_input_with(&mut stdin(), &mut <[_; 8]>::default())? {
 ///     // ...
 /// }
 /// # Ok(())
@@ -318,11 +341,34 @@ pub fn read_console<'i>(console_input: &mut impl AsConsoleInputHandle, buffer: &
 /// ```
 ///
 /// [ReadConsoleInput]: https://docs.microsoft.com/en-us/windows/console/readconsoleinput
-pub fn read_console_input<'i>(console_input: &mut impl AsConsoleInputHandle, buffer: &'i mut [INPUT_RECORD]) -> io::Result<&'i [INPUT_RECORD]> {
+pub fn read_console_input_with<'i>(console_input: &mut impl AsConsoleInputHandle, buffer: &'i mut [INPUT_RECORD]) -> io::Result<&'i [INPUT_RECORD]> {
     let length : DWORD = buffer.len().try_into().unwrap_or(!0);
     let mut read = 0;
     succeeded_to_result(unsafe { ReadConsoleInputW(console_input.as_raw_handle().cast(), buffer.as_mut_ptr(), length, &mut read) })?;
     Ok(&buffer[.. read as _])
+}
+
+/// \[[ReadConsoleInput]\] Reads data from a console input buffer and removes it from the buffer.
+///
+/// ### Example
+/// ```
+/// # use maulingmonkey_console_winapi_wrappers::*;
+/// # use std::io::{self, *};
+/// # let _ = (|| -> io::Result<()> {
+/// for record in read_console_input(&mut stdin())? {
+///     // ...
+/// }
+/// # Ok(())
+/// # })();
+/// ```
+///
+/// [ReadConsoleInput]: https://docs.microsoft.com/en-us/windows/console/readconsoleinput
+pub fn read_console_input<'i>(console_input: &mut impl AsConsoleInputHandle) -> io::Result<impl Iterator<Item = INPUT_RECORD>> {
+    const N : usize = 32;
+    let mut buffer : [INPUT_RECORD; N] = unsafe { zeroed() };
+    let mut read = 0;
+    succeeded_to_result(unsafe { ReadConsoleInputW(console_input.as_raw_handle().cast(), buffer.as_mut_ptr(), N as _, &mut read) })?;
+    Ok(std::array::IntoIter::new(buffer).take(read as _))
 }
 
 /// \[[ReadConsoleInput]\] Reads data from a console input buffer and removes it from the buffer.
