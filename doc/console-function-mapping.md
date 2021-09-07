@@ -24,9 +24,9 @@
 | <code>[FreeConsole]\();</code>                                                                    | <code>[free_console]\()?;</code>
 | <code>[GenerateConsoleCtrlEvent]\(...);</code>                                                    | ...
 | <code>[GetConsoleAlias]\(...);</code>                                                             | <code>[get_console_alias]\(...)?;<br>[get_console_alias_os]\(...)?;</code>
-| <code>[GetConsoleAliases]\(...);</code>                                                           | <code>[get_console_aliases]\(...)?;</code>
+| <code>[GetConsoleAliases]\(...);</code>                                                           | <code>[get_console_aliases]\(...)?;<br>[get_console_aliases_os]\(...)?;</code>
 | <code>[GetConsoleAliasesLength]\(...);</code>                                                     | <code>[get_console_aliases_length]\(...)?;</code>
-| <code>[GetConsoleAliasExes]\(...);</code>                                                         | <code>[get_console_alias_exes]\(...)?;</code>
+| <code>[GetConsoleAliasExes]\(...);</code>                                                         | <code>[get_console_alias_exes]\(...)?;<br>[get_console_alias_exes_os]\()?;</code>
 | <code>[GetConsoleAliasExesLength]\();</code>                                                      | <code>[get_console_alias_exes_length]\()?;</code>
 | <code>codepage = [GetConsoleCP]\();</code>                                                        | <code>codepage = [get_console_input_cp]\()?;</code>
 | <code>[GetConsoleCursorInfo]\(stdout, &mut info);</code>                                          | <code>let info = [get_console_cursor_info]\(&[stdout]\())?;</code>

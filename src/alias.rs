@@ -123,8 +123,7 @@ pub fn get_console_alias_os(source: impl AsRef<OsStr>, exe_name: impl AsRef<OsSt
 ///
 /// ```
 /// # use maulingmonkey_console_winapi_wrappers::*;
-/// let exe = "maulingmonkey-console-winapi-wrappers-test.exe";
-/// dbg!(get_console_aliases(&mut [0u16; 512], exe).unwrap().collect::<Vec<_>>());
+/// dbg!(get_console_aliases(&mut [0u16; 512], "cmd.exe").unwrap().collect::<Vec<_>>());
 /// ```
 ///
 /// ```text
@@ -160,18 +159,81 @@ pub fn get_console_alias_os(source: impl AsRef<OsStr>, exe_name: impl AsRef<OsSt
 pub fn get_console_aliases<'t>(alias_buffer: &'t mut impl AsMut<[u16]>, exe_name: impl AsRef<OsStr>) -> io::Result<TextNsvRef<'t>> {
     let alias_buffer    = alias_buffer.as_mut();
     let mut exe_name    = widen0(exe_name); // unmodified, GetConsoleAliasesW just has bad const qualifications
+    unsafe { get_console_aliases_impl(alias_buffer, &mut exe_name) }
+}
+
+/// ### Safety
+/// *   `exe_name` should be `\0` terminated
+unsafe fn get_console_aliases_impl<'t>(alias_buffer: &'t mut [u16], exe_name: &mut [u16]) -> io::Result<TextNsvRef<'t>> {
+    debug_assert!(exe_name.ends_with(&[0]));
     let bytes = wrap_last_error(|| unsafe { GetConsoleAliasesW(alias_buffer.as_mut_ptr(), size_of_val(alias_buffer) as _, exe_name.as_mut_ptr()) })?;
     Ok(TextNsvRef(&alias_buffer[..(bytes/2) as _]))
 }
 
-// TODO: get_console_aliases_vec? get_console_aliases_inplace?
+/// \[[GetConsoleAliasesW]\] Retrieves all defined console aliases for the specified executable.
+///
+/// Separates keys and values with `=`.  As keys can also contain `=`s, this can result in ambiguous aliases!  Given:
+///
+/// ```
+/// # use maulingmonkey_console_winapi_wrappers::*;
+/// dbg!(get_console_aliases_os("cmd.exe").unwrap().collect::<Vec<_>>());
+/// ```
+///
+/// ```text
+/// [src\alias.rs:???] get_console_aliases(&mut [0u16; 512], exe).unwrap().collect::<Vec<_>>() = [
+///     "test-alias1=alias1target",
+///     "test-alias2=alias2target",
+///     "test=equal=value=value",
+/// ]
+/// ```
+///
+/// The last entry could've been added by any of:
+///
+/// | Key                   | Value |
+/// | --------------------- | ----- |
+/// | `"test"`              | `"equal=value=value"`
+/// | `"test=equal"`        | `"value=value"`
+/// | `"test=equal=value"`  | `"value"`
+///
+/// ### Example
+/// ```
+/// # use maulingmonkey_console_winapi_wrappers::*;
+/// # let _ = (|| -> std::io::Result<()> {
+/// for alias in get_console_aliases_os("cmd.exe")? {
+///     dbg!(alias);
+/// }
+/// # Ok(())
+/// # })();
+/// ```
+///
+/// [GetConsoleAliasesW]: https://docs.microsoft.com/en-us/windows/console/getconsolealiases
+pub fn get_console_aliases_os<'t>(exe_name: impl AsRef<OsStr>) -> io::Result<impl Iterator<Item = OsString>> {
+    let mut exe_name    = widen0(exe_name); // unmodified, GetConsoleAliasesW just has bad const qualifications
+
+    let mut buf = vec![0u16; unsafe { get_console_aliases_length_impl(&mut exe_name) }.wchars()];
+    loop {
+        buf.resize(buf.capacity(), 0);
+        match unsafe { get_console_aliases_impl(&mut buf, &mut exe_name) } {
+            Err(err) if err.raw_os_error() == Some(ERROR_INSUFFICIENT_BUFFER as _) => {},
+            Err(err)    => return Err(err),
+            Ok(nsv)     => return Ok(nsv.map(|v| v.to_os_string()).collect::<Vec<_>>().into_iter()),
+        }
+        buf.push(0);
+    }
+}
 
 /// \[[GetConsoleAliasesLengthW]\] Retrieves the required size for the buffer, **in bytes**, for use by the [get_console_aliases] function.
 ///
 /// [GetConsoleAliasesLengthW]: https://docs.microsoft.com/en-us/windows/console/getconsolealiaseslength
 pub fn get_console_aliases_length(exe_name: impl AsRef<OsStr>) -> LengthBytesOrWchars {
-    let mut exe_name = widen0(exe_name); // unmodified, GetConsoleAliasesLengthW just has bad const qualifications
-    LengthBytesOrWchars(unsafe { GetConsoleAliasesLengthW(exe_name.as_mut_ptr()) as _ })
+    unsafe { get_console_aliases_length_impl(&mut widen0(exe_name)) }
+}
+
+/// ### Safety
+/// *   `exe_name` should be `\0` terminated
+unsafe fn get_console_aliases_length_impl(exe_name: &mut [u16]) -> LengthBytesOrWchars {
+    debug_assert!(exe_name.ends_with(&[0]));
+    LengthBytesOrWchars(GetConsoleAliasesLengthW(exe_name.as_mut_ptr()) as _)
 }
 
 
@@ -195,6 +257,33 @@ pub fn get_console_alias_exes(exe_name_buffer: &mut impl AsMut<[u16]>) -> io::Re
     let exe_name_buffer = exe_name_buffer.as_mut();
     let bytes = wrap_last_error(|| unsafe { GetConsoleAliasExesW(exe_name_buffer.as_mut_ptr(), size_of_val(exe_name_buffer) as _) })?;
     Ok(TextNsvRef(&exe_name_buffer[..(bytes/2) as _]))
+}
+
+/// \[[GetConsoleAliasExesW]\] Retrieves the names of all executable files with console aliases defined.
+///
+/// ### Example
+/// ```
+/// # use maulingmonkey_console_winapi_wrappers::*;
+/// # let _ = (|| -> std::io::Result<()> {
+/// for exe in get_console_alias_exes_os()? {
+///     dbg!(exe.to_os_string());
+/// }
+/// # Ok(())
+/// # })();
+/// ```
+///
+/// [GetConsoleAliasExesW]: https://docs.microsoft.com/en-us/windows/console/getconsolealiasexes
+pub fn get_console_alias_exes_os() -> io::Result<impl Iterator<Item = OsString>> {
+    let mut buf = vec![0u16; get_console_alias_exes_length().wchars()];
+    loop {
+        buf.resize(buf.capacity(), 0);
+        match get_console_alias_exes(&mut buf) {
+            Err(err) if err.raw_os_error() == Some(ERROR_INSUFFICIENT_BUFFER as _) => {},
+            Err(err)    => return Err(err),
+            Ok(nsv)     => return Ok(nsv.map(|v| v.to_os_string()).collect::<Vec<_>>().into_iter()),
+        }
+        buf.push(0);
+    }
 }
 
 /// \[[GetConsoleAliasExesLengthW]\] Retrieves the required size for the buffer used by the [get_console_alias_exes] function.
@@ -282,6 +371,7 @@ impl LengthBytesOrWchars {
     use wchar::wch;
 
     let exe = "maulingmonkey-console-winapi-wrappers-test.exe";
+    let exe2 = "maulingmonkey-console-winapi-wrappers-test-2.exe";
     let bad_exe = "maulingmonkey-console-winapi-wrappers-bad.exe"; // never set
 
     set_err_1(); clear_console_alias("test-alias1", (), exe).unwrap();
@@ -297,6 +387,8 @@ impl LengthBytesOrWchars {
 
     set_err_1(); add_console_alias("test-removed", "temp", exe).unwrap();
     set_err_1(); clear_console_alias("test-removed", (), exe).unwrap();
+
+    set_err_1(); add_console_alias("test-alias3", "alias3target", exe2).unwrap();
 
 
 
@@ -376,18 +468,34 @@ impl LengthBytesOrWchars {
     assert!(aliases[2].as_wchars() == wch!("test=equal=value=value"));
 
     set_err_1();
+    let mut aliases = get_console_aliases_os(exe).unwrap().collect::<Vec<_>>();
+    aliases.sort();
+    assert_eq!(aliases.len(), 3);
+    assert_eq!(aliases[0], "test-alias1=alias1target");
+    assert_eq!(aliases[1], "test-alias2=alias2target");
+    assert_eq!(aliases[2], "test=equal=value=value");
+
+    set_err_1();
     assert_eq!(get_console_aliases_length(exe).wchars(), aliases.iter().map(|a| a.len()+1).sum());
 
     set_err_1();
     let mut exes = [0u16; 512];
     let exes = get_console_alias_exes(&mut exes).unwrap().collect::<Vec<_>>();
     assert!(exes.contains(&TextRef(wch!("maulingmonkey-console-winapi-wrappers-test.exe"))));
+    assert!(exes.contains(&TextRef(wch!("maulingmonkey-console-winapi-wrappers-test-2.exe"))));
+
+    set_err_1();
+    let exes = get_console_alias_exes_os().unwrap().collect::<Vec<_>>();
+    assert!(exes.contains(&OsString::from("maulingmonkey-console-winapi-wrappers-test.exe")));
+    assert!(exes.contains(&OsString::from("maulingmonkey-console-winapi-wrappers-test-2.exe")));
 
     set_err_1(); clear_console_alias("test-alias1", (), exe).unwrap();
     set_err_1(); clear_console_alias("test-alias2", (), exe).unwrap();
+    set_err_1(); clear_console_alias("test-alias3", (), exe2).unwrap();
     set_err_1(); clear_console_alias("test=equal",  (), exe).unwrap();
 
     set_err_1(); assert!(get_console_aliases(&mut [0u16; 512], exe).unwrap().collect::<Vec<_>>().is_empty());
+    set_err_1(); assert!(get_console_aliases(&mut [0u16; 512], exe2).unwrap().collect::<Vec<_>>().is_empty());
     set_err_1(); assert!(get_console_aliases(&mut [0u16; 512], bad_exe).unwrap().collect::<Vec<_>>().is_empty());
 
     fn set_err_1() { unsafe { SetLastError(1) }; }
@@ -410,6 +518,10 @@ impl LengthBytesOrWchars {
 /// 2.  Checks the last set error after calling `f()`, regardless of the function's return value.
 ///
 /// Anything other than [`ERROR_SUCCESS`] is converted into an error.
+///
+/// [`GetConsoleAlias`]:        https://docs.microsoft.com/en-us/windows/console/getconsolealias
+/// [`GetConsoleAliases`]:      https://docs.microsoft.com/en-us/windows/console/getconsolealiases
+/// [`GetConsoleAliasExes`]:    https://docs.microsoft.com/en-us/windows/console/getconsolealiasexes
 fn wrap_last_error<R>(f: impl FnOnce() -> R) -> io::Result<R> {
     unsafe { SetLastError(0) };
     let r = f();
