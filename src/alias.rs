@@ -214,7 +214,7 @@ pub fn get_console_aliases_os<'t>(exe_name: impl AsRef<OsStr>) -> io::Result<imp
     loop {
         buf.resize(buf.capacity(), 0);
         match unsafe { get_console_aliases_impl(&mut buf, &mut exe_name) } {
-            Err(err) if err.raw_os_error() == Some(ERROR_INSUFFICIENT_BUFFER as _) => {},
+            Err(err) if err.raw_os_error() == Some(ERROR_INSUFFICIENT_BUFFER as _) => {}, // race condition: aliases grown between fetching length and fetching aliases?
             Err(err)    => return Err(err),
             Ok(nsv)     => return Ok(nsv.map(|v| v.to_os_string()).collect::<Vec<_>>().into_iter()),
         }
@@ -222,7 +222,7 @@ pub fn get_console_aliases_os<'t>(exe_name: impl AsRef<OsStr>) -> io::Result<imp
     }
 }
 
-/// \[[GetConsoleAliasesLengthW]\] Retrieves the required size for the buffer, **in bytes**, for use by the [get_console_aliases] function.
+/// \[[GetConsoleAliasesLengthW]\] Retrieves the required size for the buffer used by the [get_console_aliases] function.
 ///
 /// [GetConsoleAliasesLengthW]: https://docs.microsoft.com/en-us/windows/console/getconsolealiaseslength
 pub fn get_console_aliases_length(exe_name: impl AsRef<OsStr>) -> LengthBytesOrWchars {
@@ -278,7 +278,7 @@ pub fn get_console_alias_exes_os() -> io::Result<impl Iterator<Item = OsString>>
     loop {
         buf.resize(buf.capacity(), 0);
         match get_console_alias_exes(&mut buf) {
-            Err(err) if err.raw_os_error() == Some(ERROR_INSUFFICIENT_BUFFER as _) => {},
+            Err(err) if err.raw_os_error() == Some(ERROR_INSUFFICIENT_BUFFER as _) => {}, // race condition: exes grown between fetching length and fetching exes?
             Err(err)    => return Err(err),
             Ok(nsv)     => return Ok(nsv.map(|v| v.to_os_string()).collect::<Vec<_>>().into_iter()),
         }
