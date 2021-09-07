@@ -325,6 +325,27 @@ pub fn read_console_input<'i>(console_input: &mut impl AsConsoleInputHandle, buf
     Ok(&buffer[.. read as _])
 }
 
+/// \[[ReadConsoleInput]\] Reads data from a console input buffer and removes it from the buffer.
+///
+/// ### Example
+/// ```
+/// # use maulingmonkey_console_winapi_wrappers::*;
+/// # use std::io::{self, *};
+/// # let _ = (|| -> io::Result<()> {
+/// let record = read_console_input_one(&mut stdin())?;
+/// # Ok(())
+/// # })();
+/// ```
+///
+/// [ReadConsoleInput]: https://docs.microsoft.com/en-us/windows/console/readconsoleinput
+pub fn read_console_input_one<'i>(console_input: &mut impl AsConsoleInputHandle) -> io::Result<INPUT_RECORD> {
+    let mut record : INPUT_RECORD = unsafe { zeroed() };
+    let mut read = 0;
+    succeeded_to_result(unsafe { ReadConsoleInputW(console_input.as_raw_handle().cast(), &mut record, 1, &mut read) })?;
+    debug_assert_eq!(read, 1);
+    Ok(record)
+}
+
 /// \[[ReadConsoleOutputW]\] Reads character and color attribute data from a rectangular block of character cells in a console screen buffer, and the function writes the data to a rectangular block at a specified location in the destination buffer.
 ///
 /// ### Example
