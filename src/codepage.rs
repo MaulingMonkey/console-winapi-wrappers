@@ -9,7 +9,7 @@ use std::io;
 
 
 
-/// [Code Page Identifiers](https://docs.microsoft.com/en-us/windows/win32/intl/code-page-identifiers)
+/// \[[docs.microsoft.com](https://docs.microsoft.com/en-us/windows/win32/intl/code-page-identifiers)\] Code page identifiers (IBM437, UTF8, etc.)
 #[repr(transparent)]
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct CodePage(UINT);
@@ -116,7 +116,7 @@ pub fn set_console_output_cp(codepage: impl Into<CodePage>) -> io::Result<()> {
 
 
 
-/// [get_console_input_cp]\() [set_console_input_cp]\(new), [set_console_input_cp]\(old)
+/// \[[docs.microsoft.com]\] Sets the input code page for the duration of the scope, restoring the previous code page when dropped.
 ///
 /// ### Example
 /// ```
@@ -126,9 +126,16 @@ pub fn set_console_output_cp(codepage: impl Into<CodePage>) -> io::Result<()> {
 /// let _scope = InputCodePageScope::new(CodePage::IBM437);
 /// let _scope = InputCodePageScope::new(Some(CodePage::IBM437));
 /// ```
+///
+/// ### See Also
+/// *   [`set_console_input_cp`] - impl fn
+/// *   [`get_console_input_cp`] - impl fn
+/// *   [`OutputCodePageScope`] - twin
+///
+/// [docs.microsoft.com]: https://docs.microsoft.com/en-us/windows/console/setconsolecp
 #[derive(Debug)] pub struct InputCodePageScope  { old: CodePage }
 
-/// [get_console_output_cp]\() [set_console_output_cp]\(new), [set_console_output_cp]\(old)
+/// \[[docs.microsoft.com]\] Sets the output code page for the duration of the scope, restoring the previous code page when dropped.
 ///
 /// ### Example
 /// ```
@@ -138,6 +145,13 @@ pub fn set_console_output_cp(codepage: impl Into<CodePage>) -> io::Result<()> {
 /// let _scope = OutputCodePageScope::new(CodePage::IBM437);
 /// let _scope = OutputCodePageScope::new(Some(CodePage::IBM437));
 /// ```
+///
+/// ### See Also
+/// *   [`set_console_output_cp`] - impl fn
+/// *   [`get_console_output_cp`] - impl fn
+/// *   [`InputCodePageScope`] - twin
+///
+/// [docs.microsoft.com]: https://docs.microsoft.com/en-us/windows/console/setconsoleoutputcp
 #[derive(Debug)] pub struct OutputCodePageScope { old: CodePage }
 
 impl InputCodePageScope {

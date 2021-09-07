@@ -225,15 +225,15 @@ pub fn get_console_aliases_os<'t>(exe_name: impl AsRef<OsStr>) -> io::Result<imp
 /// \[[GetConsoleAliasesLengthW]\] Retrieves the required size for the buffer used by the [get_console_aliases] function.
 ///
 /// [GetConsoleAliasesLengthW]: https://docs.microsoft.com/en-us/windows/console/getconsolealiaseslength
-pub fn get_console_aliases_length(exe_name: impl AsRef<OsStr>) -> LengthBytesOrWchars {
+pub fn get_console_aliases_length(exe_name: impl AsRef<OsStr>) -> TextLength {
     unsafe { get_console_aliases_length_impl(&mut widen0(exe_name)) }
 }
 
 /// ### Safety
 /// *   `exe_name` should be `\0` terminated
-unsafe fn get_console_aliases_length_impl(exe_name: &mut [u16]) -> LengthBytesOrWchars {
+unsafe fn get_console_aliases_length_impl(exe_name: &mut [u16]) -> TextLength {
     debug_assert!(exe_name.ends_with(&[0]));
-    LengthBytesOrWchars(GetConsoleAliasesLengthW(exe_name.as_mut_ptr()) as _)
+    TextLength(GetConsoleAliasesLengthW(exe_name.as_mut_ptr()) as _)
 }
 
 
@@ -289,12 +289,13 @@ pub fn get_console_alias_exes_os() -> io::Result<impl Iterator<Item = OsString>>
 /// \[[GetConsoleAliasExesLengthW]\] Retrieves the required size for the buffer used by the [get_console_alias_exes] function.
 ///
 /// [GetConsoleAliasExesLengthW]: https://docs.microsoft.com/en-us/windows/console/getconsolealiasexeslength
-pub fn get_console_alias_exes_length() -> LengthBytesOrWchars {
-    LengthBytesOrWchars(unsafe { GetConsoleAliasExesLengthW() as _ })
+pub fn get_console_alias_exes_length() -> TextLength {
+    TextLength(unsafe { GetConsoleAliasExesLengthW() as _ })
 }
 
 
 
+/// \[<strike>docs.microsoft.com</strike>\] A **ref**erence to wide **text**.
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)] pub struct TextRef<'a>(&'a [u16]);
 
 impl<'a> TextRef<'a> {
@@ -327,6 +328,7 @@ impl TryFrom<TextRef<'_>> for String {
 
 
 
+/// \[<strike>docs.microsoft.com</strike>\] A **ref**erence to wide **text**, as **n**ull **s**eparated **v**alues.  (impl [Iterator]<Item = [TextRef]>)
 #[derive(Clone, Copy, Debug)] pub struct TextNsvRef<'a>(&'a [u16]);
 
 impl<'a> TextNsvRef<'a> {
@@ -358,9 +360,15 @@ impl<'a> Iterator for TextNsvRef<'a> {
 
 
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)] pub struct LengthBytesOrWchars(usize);
+/// \[<strike>docs.microsoft.com</strike>\] Length of wide text.
+///
+/// Various console functions return lengths for wide text buffers in bytes / `u8`s, despite the fact that you probably
+/// want and need lengths in `wchar_t`s / `u16`s.  This type makes things more explicit by forcing you to choose.
+///
+/// For functions which return the lengths of *narrow* text, `usize` should be used directly instead.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)] pub struct TextLength(usize);
 
-impl LengthBytesOrWchars {
+impl TextLength {
     pub fn bytes(&self) -> usize { self.0 }
     pub fn wchars(&self) -> usize { (self.0/2) + (self.0&1) }
 }

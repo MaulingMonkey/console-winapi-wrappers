@@ -91,9 +91,9 @@ pub fn attach_console_parent_process() -> io::Result<()> {
 
 
 
-/// \[[CreateConsoleScreenBuffer]\]
+/// \[[docs.microsoft.com]\] An owned win32 console screen buffer (2D grid of characters/glyphs)
 ///
-/// [CreateConsoleScreenBuffer]:        https://docs.microsoft.com/en-us/windows/console/createconsolescreenbuffer
+/// [docs.microsoft.com]:        https://docs.microsoft.com/en-us/windows/console/createconsolescreenbuffer
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ConsoleScreenBuffer {
     handle: HANDLE,
