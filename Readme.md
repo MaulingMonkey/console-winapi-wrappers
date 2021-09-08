@@ -24,7 +24,7 @@ git-fetch-with-cli = true
 ```toml
 # Cargo.toml
 [dependencies]
-maulingmonkey-console-winapi-wrappers.git   = "ssh://git@github.com/MaulingMonkey/maulingmonkey-console-winapi-wrappers.git"
+maulingmonkey-console-winapi-wrappers.git   = "ssh://git@github.com/MaulingMonkey/console-winapi-wrappers.git"
 ```
 
 ```rust
