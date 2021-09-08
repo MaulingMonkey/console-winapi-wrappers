@@ -1,6 +1,6 @@
 # maulingmonkey-console-winapi-wrappers
 
-Wrappers for [winapi](https://docs.rs/winapi/)'s [Console Functions](https://docs.microsoft.com/en-us/windows/console/console-functions)
+Unstable wrapper API for [winapi](https://docs.rs/winapi/)'s [Console Functions](https://docs.microsoft.com/en-us/windows/console/console-functions)
 
 <!--
 [![GitHub](https://img.shields.io/github/stars/MaulingMonkey/maulingmonkey-console-winapi-wrappers.svg?label=GitHub&style=social)](https://github.com/MaulingMonkey/maulingmonkey-console-winapi-wrappers)
@@ -16,15 +16,9 @@ Wrappers for [winapi](https://docs.rs/winapi/)'s [Console Functions](https://doc
 ## Quickstart
 
 ```toml
-# .cargo/config.toml
-[net]
-git-fetch-with-cli = true
-```
-
-```toml
 # Cargo.toml
 [dependencies]
-maulingmonkey-console-winapi-wrappers.git   = "ssh://git@github.com/MaulingMonkey/console-winapi-wrappers.git"
+maulingmonkey-console-winapi-wrappers.git = "https://github.com/MaulingMonkey/console-winapi-wrappers"
 ```
 
 ```rust
