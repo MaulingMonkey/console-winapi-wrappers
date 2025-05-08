@@ -343,13 +343,13 @@ pub fn get_console_alias_exes_length() -> TextLength {
     let err = get_console_alias("test-never",  &mut [0u16; 512], exe).unwrap_err();
     assert_eq!(err.raw_os_error(), Some(31));
     assert_eq!(err.raw_os_error(), Some(ERROR_GEN_FAILURE as _));
-    assert_eq!(err.kind(), io::ErrorKind::Other);
+    //assert_eq!(err.kind(), io::ErrorKind::Other); // `std` behavior has changed: returns `Uncategorized` (unstable value) as of 1.86.0
 
     set_err_1();
     let err = get_console_alias("test-removed",  &mut [0u16; 512], exe).unwrap_err();
     assert_eq!(err.raw_os_error(), Some(31));
     assert_eq!(err.raw_os_error(), Some(ERROR_GEN_FAILURE as _));
-    assert_eq!(err.kind(), io::ErrorKind::Other);
+    //assert_eq!(err.kind(), io::ErrorKind::Other); // `std` behavior has changed: returns `Uncategorized` (unstable value) as of 1.86.0
 
     set_err_1();
     let alias1 = get_console_alias("test-alias1", &mut [0u16; b"alias1target\0".len()], exe).unwrap().to_os_string();
@@ -359,7 +359,7 @@ pub fn get_console_alias_exes_length() -> TextLength {
     let err = get_console_alias("test-alias1", &mut [0u16; b"alias1target".len()], exe).unwrap_err();
     assert_eq!(err.raw_os_error(), Some(122));
     assert_eq!(err.raw_os_error(), Some(ERROR_INSUFFICIENT_BUFFER as _));
-    assert_eq!(err.kind(), io::ErrorKind::Other);
+    //assert_eq!(err.kind(), io::ErrorKind::Other); // `std` behavior has changed: returns `Uncategorized` (unstable value) as of 1.86.0
 
     set_err_1();
     let alias2 = get_console_alias("test-alias2", &mut [0u16; 512], exe).unwrap().to_os_string();
@@ -379,13 +379,13 @@ pub fn get_console_alias_exes_length() -> TextLength {
     let err = get_console_alias_os("test-never", exe).unwrap_err();
     assert_eq!(err.raw_os_error(), Some(31));
     assert_eq!(err.raw_os_error(), Some(ERROR_GEN_FAILURE as _));
-    assert_eq!(err.kind(), io::ErrorKind::Other);
+    //assert_eq!(err.kind(), io::ErrorKind::Other); // `std` behavior has changed: returns `Uncategorized` (unstable value) as of 1.86.0
 
     set_err_1();
     let err = get_console_alias_os("test-removed", exe).unwrap_err();
     assert_eq!(err.raw_os_error(), Some(31));
     assert_eq!(err.raw_os_error(), Some(ERROR_GEN_FAILURE as _));
-    assert_eq!(err.kind(), io::ErrorKind::Other);
+    //assert_eq!(err.kind(), io::ErrorKind::Other); // `std` behavior has changed: returns `Uncategorized` (unstable value) as of 1.86.0
 
     set_err_1();
     let alias1 = get_console_alias_os("test-alias1", exe).unwrap();
