@@ -9,7 +9,9 @@ use std::mem::{size_of_val, zeroed};
 
 
 
-/// \[[GetConsoleFontSize]\] Retrieves the size of the font used by the specified console screen buffer.
+#[doc(alias = "GetConsoleFontSize")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsolefontsize)\]
+/// Retrieves the size of the font used by the specified console screen buffer.
 ///
 /// ### Safety
 ///
@@ -28,7 +30,6 @@ use std::mem::{size_of_val, zeroed};
 /// # })();
 /// ```
 ///
-/// [GetConsoleFontSize]: https://docs.microsoft.com/en-us/windows/console/getconsolefontsize
 pub unsafe fn get_console_font_size(console_output: &impl AsConsoleOutputHandle, nfont: DWORD) -> io::Result<COORD> {
     match unsafe { GetConsoleFontSize(console_output.as_raw_handle().cast(), nfont) } {
         COORD { X: 0, Y: 0 }    => Err(io::Error::last_os_error()),
@@ -36,7 +37,9 @@ pub unsafe fn get_console_font_size(console_output: &impl AsConsoleOutputHandle,
     }
 }
 
-/// \[[GetCurrentConsoleFont]\] Retrieves information about the current console font.
+#[doc(alias = "GetCurrentConsoleFont")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getcurrentconsolefont)\]
+/// Retrieves information about the current console font.
 ///
 /// ### Example
 /// ```
@@ -48,14 +51,15 @@ pub unsafe fn get_console_font_size(console_output: &impl AsConsoleOutputHandle,
 /// # })();
 /// ```
 ///
-/// [GetCurrentConsoleFont]:    https://docs.microsoft.com/en-us/windows/console/getcurrentconsolefont
 pub fn get_current_console_font(console_output: &impl AsConsoleOutputHandle, maximum_window: bool) -> io::Result<CONSOLE_FONT_INFO> {
     let mut info : CONSOLE_FONT_INFO = unsafe { zeroed() };
     succeeded_to_result(unsafe { GetCurrentConsoleFont(console_output.as_raw_handle().cast(), maximum_window.into(), &mut info) })?;
     Ok(info)
 }
 
-/// \[[GetCurrentConsoleFontEx]\] Retrieves extended information about the current console font.
+#[doc(alias = "GetCurrentConsoleFontEx")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getcurrentconsolefontex)\]
+/// Retrieves extended information about the current console font.
 ///
 /// ### Example
 /// ```
@@ -67,7 +71,6 @@ pub fn get_current_console_font(console_output: &impl AsConsoleOutputHandle, max
 /// # })();
 /// ```
 ///
-/// [GetCurrentConsoleFontEx]:  https://docs.microsoft.com/en-us/windows/console/getcurrentconsolefontex
 pub fn get_current_console_font_ex(console_output: &impl AsConsoleOutputHandle, maximum_window: bool) -> io::Result<CONSOLE_FONT_INFOEX> {
     let mut info : CONSOLE_FONT_INFOEX = unsafe { zeroed() };
     info.cbSize = size_of_val(&info) as _;

@@ -8,7 +8,9 @@ use std::io;
 
 
 
-/// \[[GetConsoleMode]\] Retrieves the current mode of a console's input or screen buffer.
+#[doc(alias = "GetConsoleMode")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsolemode)\]
+/// Retrieves the current mode of a console's input or screen buffer.
 ///
 /// ### Example
 /// ```
@@ -25,14 +27,15 @@ use std::io;
 /// * [InputMode]
 /// * [OutputMode]
 ///
-/// [GetConsoleMode]:   https://docs.microsoft.com/en-us/windows/console/getconsolemode
 pub fn get_console_mode<CH: AsConsoleHandle>(handle: &CH) -> io::Result<CH::Mode> {
     let mut mode = 0;
     succeeded_to_result(unsafe { GetConsoleMode(handle.as_raw_handle().cast(), &mut mode) })?;
     Ok(mode.into())
 }
 
-/// \[[SetConsoleMode]\] Sets the mode of a console's input or screen buffer.
+#[doc(alias = "SetConsoleMode")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/setconsolemode)\]
+/// Sets the mode of a console's input or screen buffer.
 ///
 /// ### Example
 /// ```
@@ -51,12 +54,14 @@ pub fn get_console_mode<CH: AsConsoleHandle>(handle: &CH) -> io::Result<CH::Mode
 /// * [InputMode]
 /// * [OutputMode]
 ///
-/// [SetConsoleMode]:   https://docs.microsoft.com/en-us/windows/console/setconsolemode
 pub fn set_console_mode<CH: AsConsoleHandle>(handle: &mut CH, mode: CH::Mode) -> io::Result<()> {
     succeeded_to_result(unsafe { SetConsoleMode(handle.as_raw_handle().cast(), mode.into()) })
 }
 
-/// \[[GetConsoleMode] + [SetConsoleMode]\] Retrieves and changes the current mode of a console's input or screen buffer.
+#[doc(alias = "GetConsoleMode")]
+#[doc(alias = "SetConsoleMode")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/setconsolemode)\]
+/// Retrieves and changes the current mode of a console's input or screen buffer.
 ///
 /// ### Example
 /// ```
@@ -73,8 +78,6 @@ pub fn set_console_mode<CH: AsConsoleHandle>(handle: &mut CH, mode: CH::Mode) ->
 /// * [InputMode]
 /// * [OutputMode]
 ///
-/// [GetConsoleMode]:   https://docs.microsoft.com/en-us/windows/console/getconsolemode
-/// [SetConsoleMode]:   https://docs.microsoft.com/en-us/windows/console/setconsolemode
 pub fn change_console_mode<CH: AsConsoleHandle>(handle: &mut CH, map: impl FnOnce(CH::Mode) -> CH::Mode) -> io::Result<()> {
     let mode = get_console_mode(handle)?;
     let mode = map(mode);
@@ -83,10 +86,14 @@ pub fn change_console_mode<CH: AsConsoleHandle>(handle: &mut CH, map: impl FnOnc
 
 
 
-/// \[[docs.microsoft.com](https://docs.microsoft.com/en-us/windows/console/getconsolemode)\] Console modes applicable to input handles
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsolemode)\]
+/// Console modes applicable to input handles
+///
 #[repr(transparent)] #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)] pub struct InputMode(u32);
 
-/// \[[docs.microsoft.com](https://docs.microsoft.com/en-us/windows/console/getconsolemode)\] Console modes applicable to output handles / screen buffers
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsolemode)\]
+/// Console modes applicable to output handles / screen buffers
+///
 #[repr(transparent)] #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)] pub struct OutputMode(u32);
 
 impl From<u32> for InputMode  { fn from(value: u32) -> Self { Self(value) } }
@@ -116,8 +123,8 @@ impl BitOrAssign  for OutputMode { fn bitor_assign (&mut self, rhs: Self) { self
 /// are typed into the console. This mode can be used only if the [`ENABLE_LINE_INPUT`] mode is also
 /// enabled.
 ///
-/// [ReadFile]:     https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
-/// [ReadConsole]:  https://docs.microsoft.com/en-us/windows/console/readconsole
+/// [ReadFile]:     https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
+/// [ReadConsole]:  https://learn.microsoft.com/en-us/windows/console/readconsole
 #[doc(hidden)]
 pub const ENABLE_ECHO_INPUT : InputMode = InputMode(wincon::ENABLE_ECHO_INPUT);
 
@@ -129,8 +136,8 @@ pub const ENABLE_INSERT_MODE : InputMode = InputMode(wincon::ENABLE_INSERT_MODE)
 /// The [ReadFile] or [ReadConsole] function returns only when a carriage return character is read. If this
 /// mode is disabled, the functions return when one or more characters are available.
 ///
-/// [ReadFile]:     https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
-/// [ReadConsole]:  https://docs.microsoft.com/en-us/windows/console/readconsole
+/// [ReadFile]:     https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
+/// [ReadConsole]:  https://learn.microsoft.com/en-us/windows/console/readconsole
 #[doc(hidden)]
 pub const ENABLE_LINE_INPUT : InputMode = InputMode(wincon::ENABLE_LINE_INPUT);
 
@@ -138,8 +145,8 @@ pub const ENABLE_LINE_INPUT : InputMode = InputMode(wincon::ENABLE_LINE_INPUT);
 /// focus, mouse events generated by mouse movement and button presses are placed in the input buffer.
 /// These events are discarded by [ReadFile] or [ReadConsole], even when this mode is enabled.
 ///
-/// [ReadFile]:     https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
-/// [ReadConsole]:  https://docs.microsoft.com/en-us/windows/console/readconsole
+/// [ReadFile]:     https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
+/// [ReadConsole]:  https://learn.microsoft.com/en-us/windows/console/readconsole
 #[doc(hidden)]
 pub const ENABLE_MOUSE_INPUT : InputMode = InputMode(wincon::ENABLE_MOUSE_INPUT);
 
@@ -148,8 +155,8 @@ pub const ENABLE_MOUSE_INPUT : InputMode = InputMode(wincon::ENABLE_MOUSE_INPUT)
 /// in the [ReadFile] or [ReadConsole] buffer. If the [`ENABLE_LINE_INPUT`] mode is also enabled, backspace,
 /// carriage return, and line feed characters are handled by the system.
 ///
-/// [ReadFile]:     https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
-/// [ReadConsole]:  https://docs.microsoft.com/en-us/windows/console/readconsole
+/// [ReadFile]:     https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
+/// [ReadConsole]:  https://learn.microsoft.com/en-us/windows/console/readconsole
 #[doc(hidden)]
 pub const ENABLE_PROCESSED_INPUT : InputMode = InputMode(wincon::ENABLE_PROCESSED_INPUT);
 
@@ -167,9 +174,9 @@ pub const ENABLE_EXTENDED_FLAGS : InputMode = InputMode(wincon::ENABLE_EXTENDED_
 /// buffer. Information about these events can be read from the input buffer by applications using the
 /// [ReadConsoleInput] function, but not by those using [ReadFile] or [ReadConsole].
 ///
-/// [ReadConsoleInput]: https://docs.microsoft.com/en-us/windows/console/readconsoleinput
-/// [ReadFile]:         https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
-/// [ReadConsole]:      https://docs.microsoft.com/en-us/windows/console/readconsole
+/// [ReadConsoleInput]: https://learn.microsoft.com/en-us/windows/console/readconsoleinput
+/// [ReadFile]:         https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
+/// [ReadConsole]:      https://learn.microsoft.com/en-us/windows/console/readconsole
 #[doc(hidden)]
 pub const ENABLE_WINDOW_INPUT : InputMode = InputMode(wincon::ENABLE_WINDOW_INPUT);
 
@@ -181,9 +188,9 @@ pub const ENABLE_WINDOW_INPUT : InputMode = InputMode(wincon::ENABLE_WINDOW_INPU
 /// [`ENABLE_VIRTUAL_TERMINAL_PROCESSING`] on the output handle to connect to an application that
 /// communicates exclusively via virtual terminal sequences.
 ///
-/// [Console Virtual Terminal Sequences]:   https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences
-/// [WriteFile]:                            https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
-/// [WriteConsole]:                         https://docs.microsoft.com/en-us/windows/console/writeconsole
+/// [Console Virtual Terminal Sequences]:   https://learn.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences
+/// [WriteFile]:                            https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
+/// [WriteConsole]:                         https://learn.microsoft.com/en-us/windows/console/writeconsole
 #[doc(hidden)]
 pub const ENABLE_VIRTUAL_TERMINAL_INPUT : InputMode = InputMode(wincon::ENABLE_VIRTUAL_TERMINAL_INPUT);
 
@@ -192,8 +199,8 @@ impl InputMode {
     /// are typed into the console. This mode can be used only if the ENABLE_LINE_INPUT mode is also
     /// enabled.
     ///
-    /// [ReadFile]:     https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
-    /// [ReadConsole]:  https://docs.microsoft.com/en-us/windows/console/readconsole
+    /// [ReadFile]:     https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
+    /// [ReadConsole]:  https://learn.microsoft.com/en-us/windows/console/readconsole
     pub const ENABLE_ECHO_INPUT : InputMode = ENABLE_ECHO_INPUT;
 
     /// When enabled, text entered in a console window will be inserted at the current cursor location and all
@@ -203,16 +210,16 @@ impl InputMode {
     /// The [ReadFile] or [ReadConsole] function returns only when a carriage return character is read. If this
     /// mode is disabled, the functions return when one or more characters are available.
     ///
-    /// [ReadFile]:     https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
-    /// [ReadConsole]:  https://docs.microsoft.com/en-us/windows/console/readconsole
+    /// [ReadFile]:     https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
+    /// [ReadConsole]:  https://learn.microsoft.com/en-us/windows/console/readconsole
     pub const ENABLE_LINE_INPUT : InputMode = ENABLE_LINE_INPUT;
 
     /// If the mouse pointer is within the borders of the console window and the window has the keyboard
     /// focus, mouse events generated by mouse movement and button presses are placed in the input buffer.
     /// These events are discarded by [ReadFile] or [ReadConsole], even when this mode is enabled.
     ///
-    /// [ReadFile]:     https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
-    /// [ReadConsole]:  https://docs.microsoft.com/en-us/windows/console/readconsole
+    /// [ReadFile]:     https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
+    /// [ReadConsole]:  https://learn.microsoft.com/en-us/windows/console/readconsole
     pub const ENABLE_MOUSE_INPUT : InputMode = ENABLE_MOUSE_INPUT;
 
     /// CTRL+C is processed by the system and is not placed in the input buffer. If the input buffer is being
@@ -220,8 +227,8 @@ impl InputMode {
     /// in the [ReadFile] or [ReadConsole] buffer. If the [ENABLE_LINE_INPUT] mode is also enabled, backspace,
     /// carriage return, and line feed characters are handled by the system.
     ///
-    /// [ReadFile]:     https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
-    /// [ReadConsole]:  https://docs.microsoft.com/en-us/windows/console/readconsole
+    /// [ReadFile]:     https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
+    /// [ReadConsole]:  https://learn.microsoft.com/en-us/windows/console/readconsole
     pub const ENABLE_PROCESSED_INPUT : InputMode = ENABLE_PROCESSED_INPUT;
 
     /// This flag enables the user to use the mouse to select and edit text. To enable this mode, use
@@ -236,9 +243,9 @@ impl InputMode {
     /// buffer. Information about these events can be read from the input buffer by applications using the
     /// [ReadConsoleInput] function, but not by those using [ReadFile] or [ReadConsole].
     ///
-    /// [ReadConsoleInput]: https://docs.microsoft.com/en-us/windows/console/readconsoleinput
-    /// [ReadFile]:         https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
-    /// [ReadConsole]:      https://docs.microsoft.com/en-us/windows/console/readconsole
+    /// [ReadConsoleInput]: https://learn.microsoft.com/en-us/windows/console/readconsoleinput
+    /// [ReadFile]:         https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
+    /// [ReadConsole]:      https://learn.microsoft.com/en-us/windows/console/readconsole
     pub const ENABLE_WINDOW_INPUT : InputMode = ENABLE_WINDOW_INPUT;
 
     /// Setting this flag directs the Virtual Terminal processing engine to convert user input received by the
@@ -249,9 +256,9 @@ impl InputMode {
     /// [`ENABLE_VIRTUAL_TERMINAL_PROCESSING`] on the output handle to connect to an application that
     /// communicates exclusively via virtual terminal sequences.
     ///
-    /// [Console Virtual Terminal Sequences]:   https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences
-    /// [WriteFile]:                            https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
-    /// [WriteConsole]:                         https://docs.microsoft.com/en-us/windows/console/writeconsole
+    /// [Console Virtual Terminal Sequences]:   https://learn.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences
+    /// [WriteFile]:                            https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
+    /// [WriteConsole]:                         https://learn.microsoft.com/en-us/windows/console/writeconsole
     pub const ENABLE_VIRTUAL_TERMINAL_INPUT : InputMode = ENABLE_VIRTUAL_TERMINAL_INPUT;
 }
 
@@ -261,10 +268,10 @@ impl InputMode {
 /// [ReadConsole] function are parsed for ASCII control sequences, and the correct action is
 /// performed. Backspace, tab, bell, carriage return, and line feed characters are processed.
 ///
-/// [WriteFile]:    https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
-/// [WriteConsole]: https://docs.microsoft.com/en-us/windows/console/writeconsole
-/// [ReadFile]:     https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
-/// [ReadConsole]:  https://docs.microsoft.com/en-us/windows/console/readconsole
+/// [WriteFile]:    https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
+/// [WriteConsole]: https://learn.microsoft.com/en-us/windows/console/writeconsole
+/// [ReadFile]:     https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
+/// [ReadConsole]:  https://learn.microsoft.com/en-us/windows/console/readconsole
 #[doc(hidden)]
 pub const ENABLE_PROCESSED_OUTPUT : OutputMode = OutputMode(wincon::ENABLE_PROCESSED_OUTPUT);
 
@@ -276,10 +283,10 @@ pub const ENABLE_PROCESSED_OUTPUT : OutputMode = OutputMode(wincon::ENABLE_PROCE
 /// advances beyond the last row in the console screen buffer. If this mode is disabled, the last
 /// character in the row is overwritten with any subsequent characters.
 ///
-/// [WriteFile]:    https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
-/// [WriteConsole]: https://docs.microsoft.com/en-us/windows/console/writeconsole
-/// [ReadFile]:     https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
-/// [ReadConsole]:  https://docs.microsoft.com/en-us/windows/console/readconsole
+/// [WriteFile]:    https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
+/// [WriteConsole]: https://learn.microsoft.com/en-us/windows/console/writeconsole
+/// [ReadFile]:     https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
+/// [ReadConsole]:  https://learn.microsoft.com/en-us/windows/console/readconsole
 #[doc(hidden)]
 pub const ENABLE_WRAP_AT_EOL_OUTPUT : OutputMode = OutputMode(wincon::ENABLE_WRAP_AT_EOL_OUTPUT);
 
@@ -288,9 +295,9 @@ pub const ENABLE_WRAP_AT_EOL_OUTPUT : OutputMode = OutputMode(wincon::ENABLE_WRA
 /// operations that can also be performed via the existing Console APIs. For more information, see
 /// [Console Virtual Terminal Sequences].
 ///
-/// [WriteFile]:                            https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
-/// [WriteConsole]:                         https://docs.microsoft.com/en-us/windows/console/writeconsole
-/// [Console Virtual Terminal Sequences]:   https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences
+/// [WriteFile]:                            https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
+/// [WriteConsole]:                         https://learn.microsoft.com/en-us/windows/console/writeconsole
+/// [Console Virtual Terminal Sequences]:   https://learn.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences
 #[doc(hidden)]
 pub const ENABLE_VIRTUAL_TERMINAL_PROCESSING : OutputMode = OutputMode(wincon::ENABLE_VIRTUAL_TERMINAL_PROCESSING);
 
@@ -311,8 +318,8 @@ pub const ENABLE_VIRTUAL_TERMINAL_PROCESSING : OutputMode = OutputMode(wincon::E
 /// the final character on the screen (in the bottom right corner) without triggering an immediate
 /// scroll is the desired behavior.
 ///
-/// [WriteFile]:    https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
-/// [WriteConsole]: https://docs.microsoft.com/en-us/windows/console/writeconsole
+/// [WriteFile]:    https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
+/// [WriteConsole]: https://learn.microsoft.com/en-us/windows/console/writeconsole
 #[doc(hidden)]
 pub const DISABLE_NEWLINE_AUTO_RETURN : OutputMode = OutputMode(wincon::DISABLE_NEWLINE_AUTO_RETURN);
 
@@ -337,10 +344,10 @@ pub const DISABLE_NEWLINE_AUTO_RETURN : OutputMode = OutputMode(wincon::DISABLE_
 /// reverse video flags being set while this flag is still off if the attached application requests
 /// underlining or inverse video via [Console Virtual Terminal Sequences].
 ///
-/// [WriteConsoleOutput]:                   https://docs.microsoft.com/en-us/windows/console/writeconsoleoutput
-/// [WriteConsoleOutputAttribute]:          https://docs.microsoft.com/en-us/windows/console/writeconsoleoutputattribute
-/// [character attributes]:                 https://docs.microsoft.com/en-us/windows/console/console-screen-buffers#character-attributes
-/// [Console Virtual Terminal Sequences]:   https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences
+/// [WriteConsoleOutput]:                   https://learn.microsoft.com/en-us/windows/console/writeconsoleoutput
+/// [WriteConsoleOutputAttribute]:          https://learn.microsoft.com/en-us/windows/console/writeconsoleoutputattribute
+/// [character attributes]:                 https://learn.microsoft.com/en-us/windows/console/console-screen-buffers#character-attributes
+/// [Console Virtual Terminal Sequences]:   https://learn.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences
 #[doc(hidden)]
 pub const ENABLE_LVB_GRID_WORLDWIDE : OutputMode = OutputMode(wincon::ENABLE_LVB_GRID_WORLDWIDE);
 
@@ -349,10 +356,10 @@ impl OutputMode {
     /// [ReadConsole] function are parsed for ASCII control sequences, and the correct action is
     /// performed. Backspace, tab, bell, carriage return, and line feed characters are processed.
     ///
-    /// [WriteFile]:    https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
-    /// [WriteConsole]: https://docs.microsoft.com/en-us/windows/console/writeconsole
-    /// [ReadFile]:     https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
-    /// [ReadConsole]:  https://docs.microsoft.com/en-us/windows/console/readconsole
+    /// [WriteFile]:    https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
+    /// [WriteConsole]: https://learn.microsoft.com/en-us/windows/console/writeconsole
+    /// [ReadFile]:     https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
+    /// [ReadConsole]:  https://learn.microsoft.com/en-us/windows/console/readconsole
     pub const ENABLE_PROCESSED_OUTPUT : OutputMode = ENABLE_PROCESSED_OUTPUT;
 
     /// When writing with [WriteFile] or [WriteConsole] or echoing with [ReadFile] or [ReadConsole], the
@@ -363,10 +370,10 @@ impl OutputMode {
     /// advances beyond the last row in the console screen buffer. If this mode is disabled, the last
     /// character in the row is overwritten with any subsequent characters.
     ///
-    /// [WriteFile]:    https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
-    /// [WriteConsole]: https://docs.microsoft.com/en-us/windows/console/writeconsole
-    /// [ReadFile]:     https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
-    /// [ReadConsole]:  https://docs.microsoft.com/en-us/windows/console/readconsole
+    /// [WriteFile]:    https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
+    /// [WriteConsole]: https://learn.microsoft.com/en-us/windows/console/writeconsole
+    /// [ReadFile]:     https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
+    /// [ReadConsole]:  https://learn.microsoft.com/en-us/windows/console/readconsole
     pub const ENABLE_WRAP_AT_EOL_OUTPUT : OutputMode = ENABLE_WRAP_AT_EOL_OUTPUT;
 
     /// When writing with [WriteFile] or [WriteConsole], characters are parsed for VT100 and similar
@@ -374,9 +381,9 @@ impl OutputMode {
     /// operations that can also be performed via the existing Console APIs. For more information, see
     /// [Console Virtual Terminal Sequences].
     ///
-    /// [WriteFile]:                            https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
-    /// [WriteConsole]:                         https://docs.microsoft.com/en-us/windows/console/writeconsole
-    /// [Console Virtual Terminal Sequences]:   https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences
+    /// [WriteFile]:                            https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
+    /// [WriteConsole]:                         https://learn.microsoft.com/en-us/windows/console/writeconsole
+    /// [Console Virtual Terminal Sequences]:   https://learn.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences
     pub const ENABLE_VIRTUAL_TERMINAL_PROCESSING : OutputMode = ENABLE_VIRTUAL_TERMINAL_PROCESSING;
 
     /// When writing with [WriteFile] or [WriteConsole], this adds an additional state to end-of-line
@@ -396,8 +403,8 @@ impl OutputMode {
     /// the final character on the screen (in the bottom right corner) without triggering an immediate
     /// scroll is the desired behavior.
     ///
-    /// [WriteFile]:    https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
-    /// [WriteConsole]: https://docs.microsoft.com/en-us/windows/console/writeconsole
+    /// [WriteFile]:    https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
+    /// [WriteConsole]: https://learn.microsoft.com/en-us/windows/console/writeconsole
     pub const DISABLE_NEWLINE_AUTO_RETURN : OutputMode = DISABLE_NEWLINE_AUTO_RETURN;
 
     /// The APIs for writing character attributes including [WriteConsoleOutput] and
@@ -421,9 +428,9 @@ impl OutputMode {
     /// reverse video flags being set while this flag is still off if the attached application requests
     /// underlining or inverse video via [Console Virtual Terminal Sequences].
     ///
-    /// [WriteConsoleOutput]:                   https://docs.microsoft.com/en-us/windows/console/writeconsoleoutput
-    /// [WriteConsoleOutputAttribute]:          https://docs.microsoft.com/en-us/windows/console/writeconsoleoutputattribute
-    /// [character attributes]:                 https://docs.microsoft.com/en-us/windows/console/console-screen-buffers#character-attributes
-    /// [Console Virtual Terminal Sequences]:   https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences
+    /// [WriteConsoleOutput]:                   https://learn.microsoft.com/en-us/windows/console/writeconsoleoutput
+    /// [WriteConsoleOutputAttribute]:          https://learn.microsoft.com/en-us/windows/console/writeconsoleoutputattribute
+    /// [character attributes]:                 https://learn.microsoft.com/en-us/windows/console/console-screen-buffers#character-attributes
+    /// [Console Virtual Terminal Sequences]:   https://learn.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences
     pub const ENABLE_LVB_GRID_WORLDWIDE : OutputMode = ENABLE_LVB_GRID_WORLDWIDE;
 }

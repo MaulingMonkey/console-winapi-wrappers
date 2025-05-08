@@ -6,7 +6,9 @@ use std::os::windows::prelude::*;
 
 
 
-/// \[<strike>docs.microsoft.com</strike>\] A **ref**erence to wide **text**.
+/// \[<strike>microsoft.com</strike>\]
+/// A **ref**erence to wide **text**.
+///
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)] pub struct TextRef<'a>(pub(crate) &'a [u16]);
 
 impl<'a> TextRef<'a> {
@@ -39,7 +41,11 @@ impl TryFrom<TextRef<'_>> for String {
 
 
 
-/// \[<strike>docs.microsoft.com</strike>\] A **ref**erence to wide **text**, as **n**ull **s**eparated **v**alues.  (impl [Iterator]<Item = [TextRef]>)
+/// \[<strike>microsoft.com</strike>\]
+/// A **ref**erence to wide **text**, as **n**ull **s**eparated **v**alues.
+/// <br>
+/// (impl [Iterator]<Item = [TextRef]>)
+///
 #[derive(Clone, Copy, Debug)] pub struct TextNsvRef<'a>(pub(crate) &'a [u16]);
 
 impl<'a> TextNsvRef<'a> {
@@ -71,12 +77,14 @@ impl<'a> Iterator for TextNsvRef<'a> {
 
 
 
-/// \[<strike>docs.microsoft.com</strike>\] Length of wide text.
+/// \[<strike>microsoft.com</strike>\]
+/// Length of wide text, disambiguated as [bytes](Self::bytes) or [wchars](Self::wchars).
 ///
-/// Various console functions return lengths for wide text buffers in bytes / `u8`s, despite the fact that you probably
-/// want and need lengths in `wchar_t`s / `u16`s.  This type makes things more explicit by forcing you to choose.
+/// Various console functions return lengths for wide text buffers in bytes / [`u8`]s, despite the fact that you probably
+/// want and need lengths in `wchar_t`s / [`u16`]s.  This type makes things more explicit by forcing you to choose.
 ///
-/// For functions which return the lengths of *narrow* text, `usize` should be used directly instead.
+/// (Functions which return the lengths of *narrow* should instead return [`usize`], as there is no ambiguity.)
+///
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)] pub struct TextLength(pub(crate) usize);
 
 impl TextLength {

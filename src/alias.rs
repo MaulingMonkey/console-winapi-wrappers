@@ -14,19 +14,21 @@ use std::ptr::*;
 
 
 
-/// \[[AddConsoleAliasW]\] Defines a console alias for the specified executable.
+#[doc(alias = "AddConsoleAlias")]
+#[doc(alias = "AddConsoleAliasW")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/addconsolealias)\]
+/// Defines a console alias for the specified executable.
 ///
 /// ### Example
 /// ```no_run
 /// # use maulingmonkey_console_winapi_wrappers::*;
 /// # let _ = (|| -> std::io::Result<()> {
-/// // https://docs.microsoft.com/en-us/windows/console/console-aliases
+/// // https://learn.microsoft.com/en-us/windows/console/console-aliases
 /// add_console_alias("test", r"cd \<a_very_long_path>\test", "cmd.exe")?;
 /// # Ok(())
 /// # })();
 /// ```
 ///
-/// [AddConsoleAliasW]: https://docs.microsoft.com/en-us/windows/console/addconsolealias
 pub fn add_console_alias(source: impl AsRef<OsStr>, target: impl AsRef<OsStr>, exe_name: impl AsRef<OsStr>) -> io::Result<()> {
     let mut source      = widen0(source     ); // unmodified, AddConsoleAliasW just has bad const qualifications
     let mut target      = widen0(target     ); // unmodified, AddConsoleAliasW just has bad const qualifications
@@ -34,19 +36,21 @@ pub fn add_console_alias(source: impl AsRef<OsStr>, target: impl AsRef<OsStr>, e
     succeeded_to_result(unsafe { AddConsoleAliasW(source.as_mut_ptr(), target.as_mut_ptr(), exe_name.as_mut_ptr()) })
 }
 
-/// \[[AddConsoleAliasW]\] Defines a console alias for the specified executable.
+#[doc(alias = "AddConsoleAlias")]
+#[doc(alias = "AddConsoleAliasW")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/addconsolealias)\]
+/// Defines a console alias for the specified executable.
 ///
 /// ### Example
 /// ```no_run
 /// # use maulingmonkey_console_winapi_wrappers::*;
 /// # let _ = (|| -> std::io::Result<()> {
-/// // https://docs.microsoft.com/en-us/windows/console/console-aliases
+/// // https://learn.microsoft.com/en-us/windows/console/console-aliases
 /// clear_console_alias("test", (), "cmd.exe")?;
 /// # Ok(())
 /// # })();
 /// ```
 ///
-/// [AddConsoleAliasW]: https://docs.microsoft.com/en-us/windows/console/addconsolealias
 pub fn clear_console_alias(source: impl AsRef<OsStr>, _target: (), exe_name: impl AsRef<OsStr>) -> io::Result<()> {
     let mut source      = widen0(source     ); // unmodified, AddConsoleAliasW just has bad const qualifications
     let mut exe_name    = widen0(exe_name   ); // unmodified, AddConsoleAliasW just has bad const qualifications
@@ -55,7 +59,10 @@ pub fn clear_console_alias(source: impl AsRef<OsStr>, _target: (), exe_name: imp
 
 
 
-/// \[[GetConsoleAliasW]\] Retrieves the text for the specified console alias and executable.
+#[doc(alias = "GetConsoleAlias")]
+#[doc(alias = "GetConsoleAliasW")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsolealias)\]
+/// Retrieves the text for the specified console alias and executable.
 ///
 /// ### Example
 /// ```
@@ -68,7 +75,6 @@ pub fn clear_console_alias(source: impl AsRef<OsStr>, _target: (), exe_name: imp
 /// # })();
 /// ```
 ///
-/// [GetConsoleAliasW]: https://docs.microsoft.com/en-us/windows/console/getconsolealias
 pub fn get_console_alias<'t>(source: impl AsRef<OsStr>, target_buffer: &'t mut impl AsMut<[u16]>, exe_name: impl AsRef<OsStr>) -> io::Result<TextRef<'t>> {
     let target_buffer   = target_buffer .as_mut();
     let mut source      = widen0(source     ); // unmodified, GetConsoleAliasW just has bad const qualifications
@@ -77,7 +83,10 @@ pub fn get_console_alias<'t>(source: impl AsRef<OsStr>, target_buffer: &'t mut i
     Ok(TextRef(strip0(&target_buffer[..(bytes/2) as _])))
 }
 
-/// \[[GetConsoleAliasW]\] Retrieves the text for the specified console alias and executable.
+#[doc(alias = "GetConsoleAlias")]
+#[doc(alias = "GetConsoleAliasW")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsolealias)\]
+/// Retrieves the text for the specified console alias and executable.
 ///
 /// ### Example
 /// ```
@@ -90,7 +99,6 @@ pub fn get_console_alias<'t>(source: impl AsRef<OsStr>, target_buffer: &'t mut i
 /// # })();
 /// ```
 ///
-/// [GetConsoleAliasW]: https://docs.microsoft.com/en-us/windows/console/getconsolealias
 pub fn get_console_alias_os(source: impl AsRef<OsStr>, exe_name: impl AsRef<OsStr>) -> io::Result<OsString> {
     let mut target_buffer = [0u16; 512];
     let mut source      = widen0(source     ); // unmodified, GetConsoleAliasW just has bad const qualifications
@@ -116,7 +124,10 @@ pub fn get_console_alias_os(source: impl AsRef<OsStr>, exe_name: impl AsRef<OsSt
 
 
 
-/// \[[GetConsoleAliasesW]\] Retrieves all defined console aliases for the specified executable.
+#[doc(alias = "GetConsoleAliases")]
+#[doc(alias = "GetConsoleAliasesW")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsolealiases)\]
+/// Retrieves all defined console aliases for the specified executable.
 ///
 /// Separates keys and values with `=`.  As keys can also contain `=`s, this can result in ambiguous aliases!  Given:
 ///
@@ -154,7 +165,6 @@ pub fn get_console_alias_os(source: impl AsRef<OsStr>, exe_name: impl AsRef<OsSt
 /// # })();
 /// ```
 ///
-/// [GetConsoleAliasesW]: https://docs.microsoft.com/en-us/windows/console/getconsolealiases
 pub fn get_console_aliases<'t>(alias_buffer: &'t mut impl AsMut<[u16]>, exe_name: impl AsRef<OsStr>) -> io::Result<TextNsvRef<'t>> {
     let alias_buffer    = alias_buffer.as_mut();
     let mut exe_name    = widen0(exe_name); // unmodified, GetConsoleAliasesW just has bad const qualifications
@@ -169,7 +179,10 @@ unsafe fn get_console_aliases_impl<'t>(alias_buffer: &'t mut [u16], exe_name: &m
     Ok(TextNsvRef(&alias_buffer[..(bytes/2) as _]))
 }
 
-/// \[[GetConsoleAliasesW]\] Retrieves all defined console aliases for the specified executable.
+#[doc(alias = "GetConsoleAliases")]
+#[doc(alias = "GetConsoleAliasesW")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsolealiases)\]
+/// Retrieves all defined console aliases for the specified executable.
 ///
 /// Separates keys and values with `=`.  As keys can also contain `=`s, this can result in ambiguous aliases!  Given:
 ///
@@ -205,7 +218,6 @@ unsafe fn get_console_aliases_impl<'t>(alias_buffer: &'t mut [u16], exe_name: &m
 /// # })();
 /// ```
 ///
-/// [GetConsoleAliasesW]: https://docs.microsoft.com/en-us/windows/console/getconsolealiases
 pub fn get_console_aliases_os<'t>(exe_name: impl AsRef<OsStr>) -> io::Result<impl Iterator<Item = OsString>> {
     let mut exe_name    = widen0(exe_name); // unmodified, GetConsoleAliasesW just has bad const qualifications
 
@@ -221,9 +233,11 @@ pub fn get_console_aliases_os<'t>(exe_name: impl AsRef<OsStr>) -> io::Result<imp
     }
 }
 
-/// \[[GetConsoleAliasesLengthW]\] Retrieves the required size for the buffer used by the [get_console_aliases] function.
+#[doc(alias = "GetConsoleAliasesLength")]
+#[doc(alias = "GetConsoleAliasesLengthW")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsolealiaseslength)\]
+/// Retrieves the required size for the buffer used by the [get_console_aliases] function.
 ///
-/// [GetConsoleAliasesLengthW]: https://docs.microsoft.com/en-us/windows/console/getconsolealiaseslength
 pub fn get_console_aliases_length(exe_name: impl AsRef<OsStr>) -> TextLength {
     unsafe { get_console_aliases_length_impl(&mut widen0(exe_name)) }
 }
@@ -237,7 +251,10 @@ unsafe fn get_console_aliases_length_impl(exe_name: &mut [u16]) -> TextLength {
 
 
 
-/// \[[GetConsoleAliasExesW]\] Retrieves the names of all executable files with console aliases defined.
+#[doc(alias = "GetConsoleAliasExes")]
+#[doc(alias = "GetConsoleAliasExesW")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsolealiasexes)\]
+/// Retrieves the names of all executable files with console aliases defined.
 ///
 /// ### Example
 /// ```
@@ -251,14 +268,16 @@ unsafe fn get_console_aliases_length_impl(exe_name: &mut [u16]) -> TextLength {
 /// # })();
 /// ```
 ///
-/// [GetConsoleAliasExesW]: https://docs.microsoft.com/en-us/windows/console/getconsolealiasexes
 pub fn get_console_alias_exes(exe_name_buffer: &mut impl AsMut<[u16]>) -> io::Result<TextNsvRef> {
     let exe_name_buffer = exe_name_buffer.as_mut();
     let bytes = wrap_last_error(|| unsafe { GetConsoleAliasExesW(exe_name_buffer.as_mut_ptr(), size_of_val(exe_name_buffer) as _) })?;
     Ok(TextNsvRef(&exe_name_buffer[..(bytes/2) as _]))
 }
 
-/// \[[GetConsoleAliasExesW]\] Retrieves the names of all executable files with console aliases defined.
+#[doc(alias = "GetConsoleAliasExes")]
+#[doc(alias = "GetConsoleAliasExesW")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsolealiasexes)\]
+/// Retrieves the names of all executable files with console aliases defined.
 ///
 /// ### Example
 /// ```
@@ -271,7 +290,6 @@ pub fn get_console_alias_exes(exe_name_buffer: &mut impl AsMut<[u16]>) -> io::Re
 /// # })();
 /// ```
 ///
-/// [GetConsoleAliasExesW]: https://docs.microsoft.com/en-us/windows/console/getconsolealiasexes
 pub fn get_console_alias_exes_os() -> io::Result<impl Iterator<Item = OsString>> {
     let mut buf = vec![0u16; get_console_alias_exes_length().wchars()];
     loop {
@@ -285,9 +303,11 @@ pub fn get_console_alias_exes_os() -> io::Result<impl Iterator<Item = OsString>>
     }
 }
 
-/// \[[GetConsoleAliasExesLengthW]\] Retrieves the required size for the buffer used by the [get_console_alias_exes] function.
+#[doc(alias = "GetConsoleAliasExesLength")]
+#[doc(alias = "GetConsoleAliasExesLengthW")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsolealiasexeslength)\]
+/// Retrieves the required size for the buffer used by the [get_console_alias_exes] function.
 ///
-/// [GetConsoleAliasExesLengthW]: https://docs.microsoft.com/en-us/windows/console/getconsolealiasexeslength
 pub fn get_console_alias_exes_length() -> TextLength {
     TextLength(unsafe { GetConsoleAliasExesLengthW() as _ })
 }
@@ -446,9 +466,9 @@ pub fn get_console_alias_exes_length() -> TextLength {
 ///
 /// Anything other than [`ERROR_SUCCESS`] is converted into an error.
 ///
-/// [`GetConsoleAlias`]:        https://docs.microsoft.com/en-us/windows/console/getconsolealias
-/// [`GetConsoleAliases`]:      https://docs.microsoft.com/en-us/windows/console/getconsolealiases
-/// [`GetConsoleAliasExes`]:    https://docs.microsoft.com/en-us/windows/console/getconsolealiasexes
+/// [`GetConsoleAlias`]:        https://learn.microsoft.com/en-us/windows/console/getconsolealias
+/// [`GetConsoleAliases`]:      https://learn.microsoft.com/en-us/windows/console/getconsolealiases
+/// [`GetConsoleAliasExes`]:    https://learn.microsoft.com/en-us/windows/console/getconsolealiasexes
 fn wrap_last_error<R>(f: impl FnOnce() -> R) -> io::Result<R> {
     unsafe { SetLastError(0) };
     let r = f();

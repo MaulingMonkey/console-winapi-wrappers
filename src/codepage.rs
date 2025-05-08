@@ -9,7 +9,9 @@ use std::io;
 
 
 
-/// \[[docs.microsoft.com](https://docs.microsoft.com/en-us/windows/win32/intl/code-page-identifiers)\] Code page identifiers (IBM437, UTF8, etc.)
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/win32/intl/code-page-identifiers)\]
+/// Code page identifiers (IBM437, UTF8, etc.)
+///
 #[repr(transparent)]
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct CodePage(UINT);
@@ -18,9 +20,11 @@ impl CodePage {
     /// OEM United States
     pub const IBM437 : CodePage = CodePage(437);
 
+    #[doc(alias = "CP_UTF7")]
     /// UTF7
     pub const UTF7 : CodePage = CodePage(65000);
 
+    #[doc(alias = "CP_UTF8")]
     /// UTF8
     pub const UTF8 : CodePage = CodePage(65001);
 }
@@ -41,8 +45,9 @@ impl From<CodePage> for UINT { fn from(value: CodePage) -> Self { value.0 } }
 
 
 
-
-/// \[[GetConsoleCP]\] Retrieves the input code page used by the console associated with the calling process.
+#[doc(alias = "GetConsoleCP")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsolecp)\]
+/// Retrieves the input code page used by the console associated with the calling process.
 ///
 /// A console uses its input code page to translate keyboard input into the corresponding character value.
 ///
@@ -52,7 +57,6 @@ impl From<CodePage> for UINT { fn from(value: CodePage) -> Self { value.0 } }
 /// assert_eq!(get_console_input_cp().unwrap(), CodePage::IBM437);
 /// ```
 ///
-/// [GetConsoleCP]:                     https://docs.microsoft.com/en-us/windows/console/getconsolecp
 pub fn get_console_input_cp() -> io::Result<CodePage> {
     match unsafe { GetConsoleCP() } {
         0 => Err(io::Error::last_os_error()),
@@ -60,7 +64,9 @@ pub fn get_console_input_cp() -> io::Result<CodePage> {
     }
 }
 
-/// \[[GetConsoleOutputCP]\] Retrieves the output code page used by the console associated with the calling process.
+#[doc(alias = "GetConsoleOutputCP")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsoleoutputcp)\]
+/// Retrieves the output code page used by the console associated with the calling process.
 ///
 /// A console uses its output code page to translate the character values written by the various output functions into the images displayed in the console window.
 ///
@@ -70,7 +76,6 @@ pub fn get_console_input_cp() -> io::Result<CodePage> {
 /// assert_eq!(get_console_output_cp().unwrap(), CodePage::IBM437);
 /// ```
 ///
-/// [GetConsoleOutputCP]:               https://docs.microsoft.com/en-us/windows/console/getconsoleoutputcp
 pub fn get_console_output_cp() -> io::Result<CodePage> {
     match unsafe { GetConsoleOutputCP() } {
         0 => Err(io::Error::last_os_error()),
@@ -78,7 +83,9 @@ pub fn get_console_output_cp() -> io::Result<CodePage> {
     }
 }
 
-/// \[[SetConsoleCP]\] Sets the input code page used by the console associated with the calling process.
+#[doc(alias = "SetConsoleCP")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/setconsolecp)\]
+/// Sets the input code page used by the console associated with the calling process.
 ///
 /// A console uses its input code page to translate keyboard input into the corresponding character value.
 ///
@@ -91,12 +98,13 @@ pub fn get_console_output_cp() -> io::Result<CodePage> {
 /// set_console_input_cp(CodePage::from(437)).unwrap();
 /// ```
 ///
-/// [SetConsoleCP]:                     https://docs.microsoft.com/en-us/windows/console/setconsolecp
 pub fn set_console_input_cp(codepage: impl Into<CodePage>) -> io::Result<()> {
     succeeded_to_result(unsafe{SetConsoleCP(codepage.into().0)})
 }
 
-/// \[[SetConsoleOutputCP]\] Sets the output code page used by the console associated with the calling process.
+#[doc(alias = "SetConsoleOutputCP")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/setconsoleoutputcp)\]
+/// Sets the output code page used by the console associated with the calling process.
 ///
 /// A console uses its output code page to translate the character values written by the various output functions into the images displayed in the console window.
 ///
@@ -109,14 +117,14 @@ pub fn set_console_input_cp(codepage: impl Into<CodePage>) -> io::Result<()> {
 /// set_console_output_cp(CodePage::from(437)).unwrap();
 /// ```
 ///
-/// [SetConsoleOutputCP]:               https://docs.microsoft.com/en-us/windows/console/setconsoleoutputcp
 pub fn set_console_output_cp(codepage: impl Into<CodePage>) -> io::Result<()> {
     succeeded_to_result(unsafe{SetConsoleOutputCP(codepage.into().0)})
 }
 
 
 
-/// \[[docs.microsoft.com]\] Sets the input code page for the duration of the scope, restoring the previous code page when dropped.
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/setconsolecp)\]
+/// Sets the input code page for the duration of the scope, restoring the previous code page when dropped.
 ///
 /// ### Example
 /// ```
@@ -132,10 +140,10 @@ pub fn set_console_output_cp(codepage: impl Into<CodePage>) -> io::Result<()> {
 /// *   [`get_console_input_cp`] - impl fn
 /// *   [`OutputCodePageScope`] - twin
 ///
-/// [docs.microsoft.com]: https://docs.microsoft.com/en-us/windows/console/setconsolecp
 #[derive(Debug)] pub struct InputCodePageScope  { old: CodePage }
 
-/// \[[docs.microsoft.com]\] Sets the output code page for the duration of the scope, restoring the previous code page when dropped.
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/setconsoleoutputcp)\]
+/// Sets the output code page for the duration of the scope, restoring the previous code page when dropped.
 ///
 /// ### Example
 /// ```
@@ -151,10 +159,11 @@ pub fn set_console_output_cp(codepage: impl Into<CodePage>) -> io::Result<()> {
 /// *   [`get_console_output_cp`] - impl fn
 /// *   [`InputCodePageScope`] - twin
 ///
-/// [docs.microsoft.com]: https://docs.microsoft.com/en-us/windows/console/setconsoleoutputcp
 #[derive(Debug)] pub struct OutputCodePageScope { old: CodePage }
 
 impl InputCodePageScope {
+    #[doc(alias = "GetConsoleCP")]
+    #[doc(alias = "SetConsoleCP")]
     pub fn new(new: impl Into<Option<CodePage>>) -> io::Result<Self> {
         let scope = Self { old: get_console_input_cp()? };
         if let Some(new) = new.into() {
@@ -165,6 +174,8 @@ impl InputCodePageScope {
 }
 
 impl OutputCodePageScope {
+    #[doc(alias = "GetConsoleOutputCP")]
+    #[doc(alias = "SetConsoleOutputCP")]
     pub fn new(new: impl Into<Option<CodePage>>) -> io::Result<Self> {
         let scope = Self { old: get_console_output_cp()? };
         if let Some(new) = new.into() {
@@ -175,6 +186,7 @@ impl OutputCodePageScope {
 }
 
 impl Drop for InputCodePageScope {
+    #[doc(alias = "SetConsoleCP")]
     fn drop(&mut self) {
         let result = set_console_input_cp(self.old);
         if cfg!(debug_assertions) {
@@ -184,6 +196,7 @@ impl Drop for InputCodePageScope {
 }
 
 impl Drop for OutputCodePageScope {
+    #[doc(alias = "SetConsoleOutputCP")]
     fn drop(&mut self) {
         let result = set_console_output_cp(self.old);
         if cfg!(debug_assertions) {

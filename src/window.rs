@@ -9,7 +9,10 @@ use std::io;
 
 
 
-/// \[[GetConsoleOriginalTitleW]\] Retrieves the original title for the current console window.
+#[doc(alias = "GetConsoleOriginalTitle")]
+#[doc(alias = "GetConsoleOriginalTitleW")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsoleoriginaltitle)\]
+/// Retrieves the original title for the current console window.
 ///
 /// ### Example
 /// ```
@@ -22,7 +25,6 @@ use std::io;
 /// # })();
 /// ```
 ///
-/// [GetConsoleOriginalTitleW]: https://docs.microsoft.com/en-us/windows/console/getconsoletitle
 pub fn get_console_original_title() -> io::Result<OsString> {
     let mut buffer = [0u16; 64 * 1024];
     match unsafe { GetConsoleOriginalTitleW(buffer.as_mut_ptr(), buffer.len() as _) } {
@@ -31,7 +33,10 @@ pub fn get_console_original_title() -> io::Result<OsString> {
     }
 }
 
-/// \[[GetConsoleTitleW]\] Retrieves the title for the current console window.
+#[doc(alias = "GetConsoleTitle")]
+#[doc(alias = "GetConsoleTitleW")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsoletitle)\]
+/// Retrieves the title for the current console window.
 ///
 /// ### Example
 /// ```
@@ -44,7 +49,6 @@ pub fn get_console_original_title() -> io::Result<OsString> {
 /// # })();
 /// ```
 ///
-/// [GetConsoleTitleW]: https://docs.microsoft.com/en-us/windows/console/getconsoletitle
 pub fn get_console_title() -> io::Result<OsString> {
     let mut buffer = [0u16; 64 * 1024];
     match unsafe { GetConsoleTitleW(buffer.as_mut_ptr(), buffer.len() as _) } {
@@ -53,7 +57,9 @@ pub fn get_console_title() -> io::Result<OsString> {
     }
 }
 
-/// \[[GetConsoleWindow]\] Retrieves the window handle used by the console associated with the calling process.
+#[doc(alias = "GetConsoleWindow")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsolewindow)\]
+/// Retrieves the window handle used by the console associated with the calling process.
 ///
 /// ### Example
 /// ```
@@ -66,7 +72,6 @@ pub fn get_console_title() -> io::Result<OsString> {
 /// # })();
 /// ```
 ///
-/// [GetConsoleWindow]: https://docs.microsoft.com/en-us/windows/console/getconsolewindow
 pub fn get_console_window() -> io::Result<HWND> {
     match unsafe { GetConsoleWindow() } {
         hwnd if hwnd.is_null()  => Err(io::Error::last_os_error()),
@@ -74,7 +79,9 @@ pub fn get_console_window() -> io::Result<HWND> {
     }
 }
 
-/// \[[GetLargestConsoleWindowSize]\] Retrieves the size of the largest possible console window, based on the current font and the size of the display.
+#[doc(alias = "GetLargestConsoleWindowSize")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getlargestconsolewindowsize)\]
+/// Retrieves the size of the largest possible console window, based on the current font and the size of the display.
 ///
 /// ### Example
 /// ```
@@ -87,7 +94,6 @@ pub fn get_console_window() -> io::Result<HWND> {
 /// # })();
 /// ```
 ///
-/// [GetLargestConsoleWindowSize]:  https://docs.microsoft.com/en-us/windows/console/getlargestconsolewindowsize
 pub fn get_largest_console_window_size(console_output: &impl AsConsoleOutputHandle) -> io::Result<COORD> {
     match unsafe { GetLargestConsoleWindowSize(console_output.as_raw_handle().cast()) } {
         COORD { X: 0, Y: 0 }    => Err(io::Error::last_os_error()),
@@ -95,7 +101,10 @@ pub fn get_largest_console_window_size(console_output: &impl AsConsoleOutputHand
     }
 }
 
-/// \[[SetConsoleTitleW]\] Sets the title for the current console window.
+#[doc(alias = "SetConsoleTitle")]
+#[doc(alias = "SetConsoleTitleW")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/setconsoletitle)\]
+/// Sets the title for the current console window.
 ///
 /// ### Example
 /// ```
@@ -107,13 +116,14 @@ pub fn get_largest_console_window_size(console_output: &impl AsConsoleOutputHand
 /// # })();
 /// ```
 ///
-/// [SetConsoleTitleW]: https://docs.microsoft.com/en-us/windows/console/setconsoletitle
 pub fn set_console_title(title: impl AsRef<OsStr>) -> io::Result<()> {
     let title = title.as_ref().encode_wide().chain(Some(0)).collect::<Vec<_>>();
     succeeded_to_result(unsafe { SetConsoleTitleW(title.as_ptr()) })
 }
 
-/// \[[SetConsoleWindowInfo]\] Sets the current size and position of a console screen buffer's window.
+#[doc(alias = "SetConsoleWindowInfo")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/setconsolewindowinfo)\]
+/// Sets the current size and position of a console screen buffer's window.
 ///
 /// ### Example
 /// ```
@@ -125,7 +135,6 @@ pub fn set_console_title(title: impl AsRef<OsStr>) -> io::Result<()> {
 /// # })();
 /// ```
 ///
-/// [SetConsoleWindowInfo]: https://docs.microsoft.com/en-us/windows/console/setconsolewindowinfo
 pub fn set_console_window_info(console_output: &mut impl AsConsoleOutputHandle, absolute: bool, console_window: impl IntoSmallRect) -> io::Result<()> {
     succeeded_to_result(unsafe { SetConsoleWindowInfo(console_output.as_raw_handle().cast(), absolute.into(), &console_window.into_small_rect()) })
 }

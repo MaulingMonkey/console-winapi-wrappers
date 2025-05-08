@@ -11,7 +11,9 @@ use std::ptr::*;
 
 
 
-/// \[[FillConsoleOutputAttribute]\] Sets the character attributes for a specified number of character cells, beginning at the specified coordinates in a screen buffer.
+#[doc(alias = "FillConsoleOutputAttribute")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/fillconsoleoutputattribute)\]
+/// Sets the character attributes for a specified number of character cells, beginning at the specified coordinates in a screen buffer.
 ///
 /// ### Example
 /// ```
@@ -23,7 +25,6 @@ use std::ptr::*;
 /// # })();
 /// ```
 ///
-/// [FillConsoleOutputAttribute]:   https://docs.microsoft.com/en-us/windows/console/fillconsoleoutputattribute
 pub fn fill_console_output_attribute(
     console_output: &mut impl AsConsoleOutputHandle,
     attribute:      impl Into<Attributes>,
@@ -35,7 +36,10 @@ pub fn fill_console_output_attribute(
     Ok(written)
 }
 
-/// \[[FillConsoleOutputCharacterW]\] Sets the character characters for a specified number of character cells, beginning at the specified coordinates in a screen buffer.
+#[doc(alias = "FillConsoleOutputCharacter")]
+#[doc(alias = "FillConsoleOutputCharacterW")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/fillconsoleoutputcharacter)\]
+/// Sets the character characters for a specified number of character cells, beginning at the specified coordinates in a screen buffer.
 ///
 /// ### Example
 /// ```
@@ -47,7 +51,6 @@ pub fn fill_console_output_attribute(
 /// # })();
 /// ```
 ///
-/// [FillConsoleOutputCharacterW]:  https://docs.microsoft.com/en-us/windows/console/fillconsoleoutputcharacter
 pub fn fill_console_output_character(
     console_output: &mut impl AsConsoleOutputHandle,
     character:      char,
@@ -60,7 +63,9 @@ pub fn fill_console_output_character(
     Ok(written)
 }
 
-/// \[[FlushConsoleInputBuffer]\] Flushes the console input buffer. All input records currently in the input buffer are discarded.
+#[doc(alias = "FlushConsoleInputBuffer")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/flushconsoleinputbuffer)\]
+/// Flushes the console input buffer. All input records currently in the input buffer are discarded.
 ///
 /// ### Example
 /// ```
@@ -72,12 +77,13 @@ pub fn fill_console_output_character(
 /// # })();
 /// ```
 ///
-/// [FlushConsoleInputBuffer]:  https://docs.microsoft.com/en-us/windows/console/flushconsoleinputbuffer
 pub fn flush_console_input_buffer(console_input: &mut impl AsConsoleInputHandle) -> io::Result<()> {
     succeeded_to_result(unsafe { FlushConsoleInputBuffer(console_input.as_raw_handle().cast()) })
 }
 
-/// \[[GetConsoleCursorInfo]\] Retrieves information about the size and visibility of the cursor for the specified console screen buffer.
+#[doc(alias = "GetConsoleCursorInfo")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsolecursorinfo)\]
+/// Retrieves information about the size and visibility of the cursor for the specified console screen buffer.
 ///
 /// ### Example
 /// ```
@@ -91,14 +97,15 @@ pub fn flush_console_input_buffer(console_input: &mut impl AsConsoleInputHandle)
 /// # })();
 /// ```
 ///
-/// [GetConsoleCursorInfo]: https://docs.microsoft.com/en-us/windows/console/getconsolecursorinfo
 pub fn get_console_cursor_info(console_output: &impl AsConsoleOutputHandle) -> io::Result<CONSOLE_CURSOR_INFO> {
     let mut info : CONSOLE_CURSOR_INFO = unsafe { zeroed() };
     succeeded_to_result(unsafe { GetConsoleCursorInfo(console_output.as_raw_handle().cast(), &mut info) })?;
     Ok(info)
 }
 
-/// \[[GetConsoleDisplayMode]\] Retrieves the display mode of the current console.
+#[doc(alias = "GetConsoleDisplayMode")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsoledisplaymode)\]
+/// Retrieves the display mode of the current console.
 ///
 /// ### Example
 /// ```
@@ -111,14 +118,15 @@ pub fn get_console_cursor_info(console_output: &impl AsConsoleOutputHandle) -> i
 /// # })();
 /// ```
 ///
-/// [GetConsoleDisplayMode]:    https://docs.microsoft.com/en-us/windows/console/getconsoledisplaymode
 pub fn get_console_display_mode() -> io::Result<DWORD> {
     let mut mode = 0;
     succeeded_to_result(unsafe { GetConsoleDisplayMode(&mut mode) })?;
     Ok(mode)
 }
 
-/// \[[GetConsoleHistoryInfo]\] Retrieves the history settings for the calling process's console.
+#[doc(alias = "GetConsoleHistoryInfo")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsolehistoryinfo)\]
+/// Retrieves the history settings for the calling process's console.
 ///
 /// ### Example
 /// ```
@@ -130,14 +138,15 @@ pub fn get_console_display_mode() -> io::Result<DWORD> {
 /// # })();
 /// ```
 ///
-/// [GetConsoleHistoryInfo]:    https://docs.microsoft.com/en-us/windows/console/getconsolehistoryinfo
 pub fn get_console_history_info() -> io::Result<CONSOLE_HISTORY_INFO> {
     let mut info : CONSOLE_HISTORY_INFO = unsafe { zeroed() };
     succeeded_to_result(unsafe { GetConsoleHistoryInfo(&mut info) })?;
     Ok(info)
 }
 
-/// \[[GetConsoleScreenBufferInfo]\] Retrieves information about the specified console screen buffer.
+#[doc(alias = "GetConsoleScreenBufferInfo")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsolescreenbufferinfo)\]
+/// Retrieves information about the specified console screen buffer.
 ///
 /// ### Example
 /// ```
@@ -149,14 +158,15 @@ pub fn get_console_history_info() -> io::Result<CONSOLE_HISTORY_INFO> {
 /// # })();
 /// ```
 ///
-/// [GetConsoleScreenBufferInfo]:   https://docs.microsoft.com/en-us/windows/console/getconsolescreenbufferinfo
 pub fn get_console_screen_buffer_info(console_output: &impl AsConsoleOutputHandle) -> io::Result<CONSOLE_SCREEN_BUFFER_INFO> {
     let mut info : CONSOLE_SCREEN_BUFFER_INFO = unsafe { zeroed() };
     succeeded_to_result(unsafe { GetConsoleScreenBufferInfo(console_output.as_raw_handle().cast(), &mut info) })?;
     Ok(info)
 }
 
-/// \[[GetConsoleScreenBufferInfoEx]\] Retrieves extended information about the specified console screen buffer.
+#[doc(alias = "GetConsoleScreenBufferInfoEx")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsolescreenbufferinfoex)\]
+/// Retrieves extended information about the specified console screen buffer.
 ///
 /// ### Example
 /// ```
@@ -168,7 +178,6 @@ pub fn get_console_screen_buffer_info(console_output: &impl AsConsoleOutputHandl
 /// # })();
 /// ```
 ///
-/// [GetConsoleScreenBufferInfoEx]: https://docs.microsoft.com/en-us/windows/console/getconsolescreenbufferinfoex
 pub fn get_console_screen_buffer_info_ex(console_output: &impl AsConsoleOutputHandle) -> io::Result<CONSOLE_SCREEN_BUFFER_INFOEX> {
     let mut info : CONSOLE_SCREEN_BUFFER_INFOEX = unsafe { zeroed() };
     info.cbSize = size_of_val(&info) as _;
@@ -176,7 +185,9 @@ pub fn get_console_screen_buffer_info_ex(console_output: &impl AsConsoleOutputHa
     Ok(info)
 }
 
-/// \[[GetConsoleSelectionInfo]\] Retrieves information about the current console selection.
+#[doc(alias = "GetConsoleSelectionInfo")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsoleselectioninfo)\]
+/// Retrieves information about the current console selection.
 ///
 /// ### Example
 /// ```
@@ -188,14 +199,15 @@ pub fn get_console_screen_buffer_info_ex(console_output: &impl AsConsoleOutputHa
 /// # })();
 /// ```
 ///
-/// [GetConsoleSelectionInfo]:  https://docs.microsoft.com/en-us/windows/console/getconsoleselectioninfo
 pub fn get_console_selection_info() -> io::Result<CONSOLE_SELECTION_INFO> {
     let mut info : CONSOLE_SELECTION_INFO = unsafe { zeroed() };
     succeeded_to_result(unsafe { GetConsoleSelectionInfo(&mut info) })?;
     Ok(info)
 }
 
-/// \[[GetNumberOfConsoleInputEvents]\] Retrieves the number of unread input records in the console's input buffer.
+#[doc(alias = "GetNumberOfConsoleInputEvents")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getnumberofconsoleinputevents)\]
+/// Retrieves the number of unread input records in the console's input buffer.
 ///
 /// ### Example
 /// ```
@@ -207,14 +219,15 @@ pub fn get_console_selection_info() -> io::Result<CONSOLE_SELECTION_INFO> {
 /// # })();
 /// ```
 ///
-/// [GetNumberOfConsoleInputEvents]:    https://docs.microsoft.com/en-us/windows/console/getnumberofconsoleinputevents
 pub fn get_number_of_console_input_events(console_input: &impl AsConsoleInputHandle) -> io::Result<usize> {
     let mut n = 0;
     succeeded_to_result(unsafe { GetNumberOfConsoleInputEvents(console_input.as_raw_handle().cast(), &mut n) })?;
     Ok(n as _)
 }
 
-/// \[[GetNumberOfConsoleMouseButtons]\] Retrieves the number of buttons on the mouse used by the current console.
+#[doc(alias = "GetNumberOfConsoleMouseButtons")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getnumberofconsolemousebuttons)\]
+/// Retrieves the number of buttons on the mouse used by the current console.
 ///
 /// ### Example
 /// ```
@@ -226,7 +239,6 @@ pub fn get_number_of_console_input_events(console_input: &impl AsConsoleInputHan
 /// # })();
 /// ```
 ///
-/// [GetNumberOfConsoleMouseButtons]:   https://docs.microsoft.com/en-us/windows/console/getnumberofconsolemousebuttons
 pub fn get_number_of_console_mouse_buttons() -> io::Result<usize> {
     let mut buttons = 0;
     succeeded_to_result(unsafe { GetNumberOfConsoleMouseButtons(&mut buttons) })?;
@@ -235,7 +247,10 @@ pub fn get_number_of_console_mouse_buttons() -> io::Result<usize> {
 
 // GetStdHandle: Prefer AsRawHandle
 
-/// \[[PeekConsoleInput]\] Reads data from the specified console input buffer without removing it from the buffer.
+#[doc(alias = "PeekConsoleInput")]
+#[doc(alias = "PeekConsoleInputW")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/peekconsoleinput)\]
+/// Reads data from the specified console input buffer without removing it from the buffer.
 ///
 /// ### Example
 /// ```
@@ -249,7 +264,6 @@ pub fn get_number_of_console_mouse_buttons() -> io::Result<usize> {
 /// # })();
 /// ```
 ///
-/// [PeekConsoleInput]: https://docs.microsoft.com/en-us/windows/console/peekconsoleinput
 pub fn peek_console_input_with<'i>(console_input: &impl AsConsoleInputHandle, buffer: &'i mut [INPUT_RECORD]) -> io::Result<&'i [INPUT_RECORD]> {
     let length : DWORD = buffer.len().try_into().unwrap_or(!0);
     let mut read = 0;
@@ -257,7 +271,10 @@ pub fn peek_console_input_with<'i>(console_input: &impl AsConsoleInputHandle, bu
     Ok(&buffer[.. read as _])
 }
 
-/// \[[PeekConsoleInput]\] Reads data from the specified console input buffer without removing it from the buffer.
+#[doc(alias = "PeekConsoleInput")]
+#[doc(alias = "PeekConsoleInputW")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/peekconsoleinput)\]
+/// Reads data from the specified console input buffer without removing it from the buffer.
 ///
 /// ### Example
 /// ```
@@ -271,7 +288,6 @@ pub fn peek_console_input_with<'i>(console_input: &impl AsConsoleInputHandle, bu
 /// # })();
 /// ```
 ///
-/// [PeekConsoleInput]: https://docs.microsoft.com/en-us/windows/console/peekconsoleinput
 pub fn peek_console_input<'i>(console_input: &impl AsConsoleInputHandle) -> io::Result<impl Iterator<Item = INPUT_RECORD>> {
     const N : usize = 32;
     let mut buffer : [INPUT_RECORD; N] = unsafe { zeroed() };
@@ -280,7 +296,10 @@ pub fn peek_console_input<'i>(console_input: &impl AsConsoleInputHandle) -> io::
     Ok(std::array::IntoIter::new(buffer).take(read as _))
 }
 
-/// \[[PeekConsoleInput]\] Reads data from the specified console input buffer without removing it from the buffer.
+#[doc(alias = "PeekConsoleInput")]
+#[doc(alias = "PeekConsoleInputW")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/peekconsoleinput)\]
+/// Reads data from the specified console input buffer without removing it from the buffer.
 ///
 /// ### Example
 /// ```
@@ -294,14 +313,16 @@ pub fn peek_console_input<'i>(console_input: &impl AsConsoleInputHandle) -> io::
 /// # })();
 /// ```
 ///
-/// [PeekConsoleInput]: https://docs.microsoft.com/en-us/windows/console/peekconsoleinput
 pub fn peek_console_input_one(console_input: &impl AsConsoleInputHandle) -> io::Result<Option<INPUT_RECORD>> {
     let mut record : INPUT_RECORD = unsafe { zeroed() };
     let empty = peek_console_input_with(console_input, std::slice::from_mut(&mut record))?.is_empty();
     Ok(if empty { None } else { Some(record) })
 }
 
-/// \[[ReadConsole]\] Reads character input from the console input buffer and removes it from the buffer.
+#[doc(alias = "ReadConsole")]
+#[doc(alias = "ReadConsoleW")]
+/// \[[ReadConsole](https://learn.microsoft.com/en-us/windows/console/readconsole)\]
+/// Reads character input from the console input buffer and removes it from the buffer.
 ///
 /// ### Example
 /// ```
@@ -314,7 +335,6 @@ pub fn peek_console_input_one(console_input: &impl AsConsoleInputHandle) -> io::
 /// # })();
 /// ```
 ///
-/// [ReadConsole]:  https://docs.microsoft.com/en-us/windows/console/readconsole
 pub fn read_console<'i>(console_input: &mut impl AsConsoleInputHandle, buffer: &'i mut [u16], input_control: Option<&CONSOLE_READCONSOLE_CONTROL>) -> io::Result<&'i [u16]> {
     let input_control : *const CONSOLE_READCONSOLE_CONTROL = match input_control {
         None => null(),
@@ -326,7 +346,10 @@ pub fn read_console<'i>(console_input: &mut impl AsConsoleInputHandle, buffer: &
     Ok(&buffer[.. read as _])
 }
 
-/// \[[ReadConsoleInput]\] Reads data from a console input buffer and removes it from the buffer.
+#[doc(alias = "ReadConsoleInput")]
+#[doc(alias = "ReadConsoleInputW")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/readconsoleinput)\]
+/// Reads data from a console input buffer and removes it from the buffer.
 ///
 /// ### Example
 /// ```
@@ -340,7 +363,6 @@ pub fn read_console<'i>(console_input: &mut impl AsConsoleInputHandle, buffer: &
 /// # })();
 /// ```
 ///
-/// [ReadConsoleInput]: https://docs.microsoft.com/en-us/windows/console/readconsoleinput
 pub fn read_console_input_with<'i>(console_input: &mut impl AsConsoleInputHandle, buffer: &'i mut [INPUT_RECORD]) -> io::Result<&'i [INPUT_RECORD]> {
     let length : DWORD = buffer.len().try_into().unwrap_or(!0);
     let mut read = 0;
@@ -348,7 +370,10 @@ pub fn read_console_input_with<'i>(console_input: &mut impl AsConsoleInputHandle
     Ok(&buffer[.. read as _])
 }
 
-/// \[[ReadConsoleInput]\] Reads data from a console input buffer and removes it from the buffer.
+#[doc(alias = "ReadConsoleInput")]
+#[doc(alias = "ReadConsoleInputW")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/readconsoleinput)\]
+/// Reads data from a console input buffer and removes it from the buffer.
 ///
 /// ### Example
 /// ```
@@ -362,7 +387,6 @@ pub fn read_console_input_with<'i>(console_input: &mut impl AsConsoleInputHandle
 /// # })();
 /// ```
 ///
-/// [ReadConsoleInput]: https://docs.microsoft.com/en-us/windows/console/readconsoleinput
 pub fn read_console_input<'i>(console_input: &mut impl AsConsoleInputHandle) -> io::Result<impl Iterator<Item = INPUT_RECORD>> {
     const N : usize = 32;
     let mut buffer : [INPUT_RECORD; N] = unsafe { zeroed() };
@@ -371,7 +395,10 @@ pub fn read_console_input<'i>(console_input: &mut impl AsConsoleInputHandle) -> 
     Ok(std::array::IntoIter::new(buffer).take(read as _))
 }
 
-/// \[[ReadConsoleInput]\] Reads data from a console input buffer and removes it from the buffer.
+#[doc(alias = "ReadConsoleInput")]
+#[doc(alias = "ReadConsoleInputW")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/readconsoleinput)\]
+/// Reads data from a console input buffer and removes it from the buffer.
 ///
 /// ### Example
 /// ```
@@ -383,7 +410,6 @@ pub fn read_console_input<'i>(console_input: &mut impl AsConsoleInputHandle) -> 
 /// # })();
 /// ```
 ///
-/// [ReadConsoleInput]: https://docs.microsoft.com/en-us/windows/console/readconsoleinput
 pub fn read_console_input_one<'i>(console_input: &mut impl AsConsoleInputHandle) -> io::Result<INPUT_RECORD> {
     let mut record : INPUT_RECORD = unsafe { zeroed() };
     let mut read = 0;
@@ -392,7 +418,10 @@ pub fn read_console_input_one<'i>(console_input: &mut impl AsConsoleInputHandle)
     Ok(record)
 }
 
-/// \[[ReadConsoleOutputW]\] Reads character and color attribute data from a rectangular block of character cells in a console screen buffer, and the function writes the data to a rectangular block at a specified location in the destination buffer.
+#[doc(alias = "ReadConsoleOutput")]
+#[doc(alias = "ReadConsoleOutputW")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/readconsoleoutput)\]
+/// Reads character and color attribute data from a rectangular block of character cells in a console screen buffer, and the function writes the data to a rectangular block at a specified location in the destination buffer.
 ///
 /// ### Example
 /// ```
@@ -407,7 +436,6 @@ pub fn read_console_input_one<'i>(console_input: &mut impl AsConsoleInputHandle)
 /// # })();
 /// ```
 ///
-/// [ReadConsoleOutputW]:   https://docs.microsoft.com/en-us/windows/console/readconsoleoutput
 pub fn read_console_output(console_output: &impl AsConsoleOutputHandle, buffer: &mut [CHAR_INFO], buffer_size: impl IntoCoord, buffer_coord: impl IntoCoord, read_region: &mut SMALL_RECT) -> io::Result<()> {
     let console_output = console_output.as_raw_handle().cast();
     let buffer_size = buffer_size.into_coord();
@@ -425,7 +453,9 @@ pub fn read_console_output(console_output: &impl AsConsoleOutputHandle, buffer: 
     succeeded_to_result(unsafe { ReadConsoleOutputW(console_output, buffer.as_mut_ptr(), buffer_size, buffer_coord, read_region) })
 }
 
-/// \[[ReadConsoleOutputAttribute]\] Copies a specified number of character attributes from consecutive cells of a console screen buffer, beginning at a specified location.
+#[doc(alias = "ReadConsoleOutputAttribute")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/readconsoleoutputattribute)\]
+/// Copies a specified number of character attributes from consecutive cells of a console screen buffer, beginning at a specified location.
 ///
 /// ### Example
 /// ```
@@ -438,7 +468,6 @@ pub fn read_console_output(console_output: &impl AsConsoleOutputHandle, buffer: 
 /// # })();
 /// ```
 ///
-/// [ReadConsoleOutputAttribute]:   https://docs.microsoft.com/en-us/windows/console/readconsoleoutputattribute
 pub fn read_console_output_attribute<'a>(console_output: &impl AsConsoleOutputHandle, attributes: &'a mut [Attributes], read_coord: impl IntoCoord) -> io::Result<&'a [Attributes]> {
     let console_output = console_output.as_raw_handle().cast();
     let length : DWORD = attributes.len().try_into().unwrap_or(!0);
@@ -449,7 +478,10 @@ pub fn read_console_output_attribute<'a>(console_output: &impl AsConsoleOutputHa
     Ok(&attributes[.. read as _])
 }
 
-/// \[[ReadConsoleOutputCharacter]\] Copies a specified number of character attributes from consecutive cells of a console screen buffer, beginning at a specified location.
+#[doc(alias = "ReadConsoleOutputCharacter")]
+#[doc(alias = "ReadConsoleOutputCharacterW")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/readconsoleoutputcharacter)\]
+/// Copies a specified number of character attributes from consecutive cells of a console screen buffer, beginning at a specified location.
 ///
 /// ### Example
 /// ```
@@ -462,7 +494,6 @@ pub fn read_console_output_attribute<'a>(console_output: &impl AsConsoleOutputHa
 /// # })();
 /// ```
 ///
-/// [ReadConsoleOutputCharacter]:   https://docs.microsoft.com/en-us/windows/console/readconsoleoutputcharacter
 pub fn read_console_output_character<'a>(console_output: &impl AsConsoleOutputHandle, characters: &'a mut [u16], read_coord: impl IntoCoord) -> io::Result<&'a [u16]> {
     let console_output = console_output.as_raw_handle().cast();
     let length : DWORD = characters.len().try_into().unwrap_or(!0);
@@ -475,7 +506,9 @@ pub fn read_console_output_character<'a>(console_output: &impl AsConsoleOutputHa
 
 // TODO: ScrollConsoleScreenBuffer
 
-/// \[[SetConsoleActiveScreenBuffer]\] Sets the specified screen buffer to be the currently displayed console screen buffer.
+#[doc(alias = "SetConsoleActiveScreenBuffer")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/setconsoleactivescreenbuffer)\]
+/// Sets the specified screen buffer to be the currently displayed console screen buffer.
 ///
 /// ### Example
 /// ```
@@ -488,12 +521,13 @@ pub fn read_console_output_character<'a>(console_output: &impl AsConsoleOutputHa
 /// # })();
 /// ```
 ///
-/// [SetConsoleActiveScreenBuffer]: https://docs.microsoft.com/en-us/windows/console/setconsoleactivescreenbuffer
 pub fn set_console_active_screen_buffer(console_output: &impl AsConsoleOutputHandle) -> io::Result<()> {
     succeeded_to_result(unsafe { SetConsoleActiveScreenBuffer(console_output.as_raw_handle().cast()) })
 }
 
-/// \[[SetConsoleCursorInfo]\] Sets the size and visibility of the cursor for the specified console screen buffer.
+#[doc(alias = "SetConsoleCursorInfo")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/setconsolecursorinfo)\]
+/// Sets the size and visibility of the cursor for the specified console screen buffer.
 ///
 /// ### Example
 /// ```
@@ -506,7 +540,6 @@ pub fn set_console_active_screen_buffer(console_output: &impl AsConsoleOutputHan
 /// # })();
 /// ```
 ///
-/// [SetConsoleCursorInfo]: https://docs.microsoft.com/en-us/windows/console/setconsolecursorinfo
 pub fn set_console_cursor_info(console_output: &mut impl AsConsoleOutputHandle, info: impl Into<CONSOLE_CURSOR_INFO>) -> io::Result<()> {
     let mut info = info.into();
 
@@ -518,7 +551,9 @@ pub fn set_console_cursor_info(console_output: &mut impl AsConsoleOutputHandle, 
     succeeded_to_result(unsafe { SetConsoleCursorInfo(console_output.as_raw_handle().cast(), &info) })
 }
 
-/// \[[SetConsoleCursorPosition]\] Sets the cursor position in the specified console screen buffer.
+#[doc(alias = "SetConsoleCursorPosition")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/setconsolecursorposition)\]
+/// Sets the cursor position in the specified console screen buffer.
 ///
 /// ### Example
 /// ```
@@ -530,7 +565,6 @@ pub fn set_console_cursor_info(console_output: &mut impl AsConsoleOutputHandle, 
 /// # })();
 /// ```
 ///
-/// [SetConsoleCursorPosition]: https://docs.microsoft.com/en-us/windows/console/setconsolecursorposition
 pub fn set_console_cursor_position(console_output: &mut impl AsConsoleOutputHandle, cursor_position: impl IntoCoord) -> io::Result<()> {
     succeeded_to_result(unsafe { SetConsoleCursorPosition(console_output.as_raw_handle().cast(), cursor_position.into_coord()) })
 }
@@ -540,7 +574,9 @@ pub fn set_console_cursor_position(console_output: &mut impl AsConsoleOutputHand
 // TODO: SetConsoleScreenBufferInfoEx
 // TODO: SetConsoleScreenBufferInfo
 
-/// \[[SetConsoleScreenBufferSize]\] Changes the size of the specified console screen buffer.
+#[doc(alias = "SetConsoleScreenBufferSize")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/setconsolescreenbuffersize)\]
+/// Changes the size of the specified console screen buffer.
 ///
 /// ### Example
 /// ```
@@ -555,12 +591,13 @@ pub fn set_console_cursor_position(console_output: &mut impl AsConsoleOutputHand
 /// # })();
 /// ```
 ///
-/// [SetConsoleScreenBufferSize]:   https://docs.microsoft.com/en-us/windows/console/setconsolescreenbuffersize
 pub fn set_console_screen_buffer_size(console_output: &mut impl AsConsoleOutputHandle, size: impl IntoCoord) -> io::Result<()> {
     succeeded_to_result(unsafe { SetConsoleScreenBufferSize(console_output.as_raw_handle().cast(), size.into_coord()) })
 }
 
-/// \[[SetConsoleTextAttribute]\] Sets the attributes of characters written to the console screen buffer by the [WriteFile] or [WriteConsole] function, or echoed by the [ReadFile] or [ReadConsole] function. This function affects text written after the function call.
+#[doc(alias = "SetConsoleTextAttribute")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/setconsoletextattribute)\]
+/// Sets the attributes of characters written to the console screen buffer by the [WriteFile] or [WriteConsole] function, or echoed by the [ReadFile] or [ReadConsole] function. This function affects text written after the function call.
 ///
 /// ### Example
 /// ```
@@ -572,11 +609,10 @@ pub fn set_console_screen_buffer_size(console_output: &mut impl AsConsoleOutputH
 /// # })();
 /// ```
 ///
-/// [SetConsoleTextAttribute]:  https://docs.microsoft.com/en-us/windows/console/setconsoletextattribute
-/// [WriteFile]:                https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
-/// [WriteConsole]:             https://docs.microsoft.com/en-us/windows/console/writeconsole
-/// [ReadFile]:                 https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
-/// [ReadConsole]:              https://docs.microsoft.com/en-us/windows/console/readconsole
+/// [WriteFile]:                https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
+/// [WriteConsole]:             https://learn.microsoft.com/en-us/windows/console/writeconsole
+/// [ReadFile]:                 https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
+/// [ReadConsole]:              https://learn.microsoft.com/en-us/windows/console/readconsole
 pub fn set_console_text_attribute(console_output: &mut impl AsConsoleOutputHandle, attributes: impl Into<Attributes>) -> io::Result<()> {
     succeeded_to_result(unsafe { SetConsoleTextAttribute(console_output.as_raw_handle().cast(), attributes.into().into()) })
 }
@@ -584,7 +620,10 @@ pub fn set_console_text_attribute(console_output: &mut impl AsConsoleOutputHandl
 // TODO: SetConsoleWindowInfo
 // TODO: SetStdHandle?
 
-/// \[[WriteConsoleW]\] Writes a character string to a console screen buffer beginning at the current cursor location.
+#[doc(alias = "WriteConsole")]
+#[doc(alias = "WriteConsoleW")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/writeconsole)\]
+/// Writes a character string to a console screen buffer beginning at the current cursor location.
 ///
 /// ### Example
 /// ```
@@ -596,7 +635,6 @@ pub fn set_console_text_attribute(console_output: &mut impl AsConsoleOutputHandl
 /// # })();
 /// ```
 ///
-/// [WriteConsoleW]: https://docs.microsoft.com/en-us/windows/console/writeconsole
 pub fn write_console(console_output: &mut impl AsConsoleOutputHandle, buffer: &[u16], _reserved: impl Reserved) -> io::Result<usize> {
     let length = buffer.len().try_into().unwrap_or(!0);
     let mut written = 0;
@@ -604,7 +642,10 @@ pub fn write_console(console_output: &mut impl AsConsoleOutputHandle, buffer: &[
     Ok(written as _)
 }
 
-/// \[[WriteConsoleInput]\] Writes data directly to the console input buffer.
+#[doc(alias = "WriteConsoleInput")]
+#[doc(alias = "WriteConsoleInputW")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/writeconsoleinput)\]
+/// Writes data directly to the console input buffer.
 ///
 /// ### Example
 /// ```
@@ -626,7 +667,6 @@ pub fn write_console(console_output: &mut impl AsConsoleOutputHandle, buffer: &[
 /// # }})();
 /// ```
 ///
-/// [WriteConsoleInput]:    https://docs.microsoft.com/en-us/windows/console/writeconsoleinput
 pub fn write_console_input(console_input: &mut impl AsConsoleInputHandle, buffer: &[INPUT_RECORD]) -> io::Result<usize> {
     let length = buffer.len().try_into().unwrap_or(!0);
     let mut written = 0;
@@ -634,7 +674,11 @@ pub fn write_console_input(console_input: &mut impl AsConsoleInputHandle, buffer
     Ok(written as _ )
 }
 
-/// \[[WriteConsoleOutputW]\] Writes character and color attribute data to a specified rectangular block of character cells in a console screen buffer. The data to be written is taken from a correspondingly sized rectangular block at a specified location in the source buffer.
+#[doc(alias = "WriteConsoleOutput")]
+#[doc(alias = "WriteConsoleOutputW")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/writeconsoleoutput)\]
+/// Writes character and color attribute data to a specified rectangular block of character cells in a console screen buffer.
+/// The data to be written is taken from a correspondingly sized rectangular block at a specified location in the source buffer.
 ///
 /// ### Example
 /// ```
@@ -654,7 +698,6 @@ pub fn write_console_input(console_input: &mut impl AsConsoleInputHandle, buffer
 /// # })();
 /// ```
 ///
-/// [WriteConsoleOutputW]:  https://docs.microsoft.com/en-us/windows/console/writeconsoleoutput
 pub fn write_console_output(console_output: &mut impl AsConsoleOutputHandle, buffer: &[CHAR_INFO], buffer_size: impl IntoCoord, buffer_coord: impl IntoCoord, write_region: &mut SMALL_RECT) -> io::Result<()> {
     let console_output = console_output.as_raw_handle().cast();
     let buffer_size = buffer_size.into_coord();
@@ -672,7 +715,9 @@ pub fn write_console_output(console_output: &mut impl AsConsoleOutputHandle, buf
     succeeded_to_result(unsafe { WriteConsoleOutputW(console_output, buffer.as_ptr(), buffer_size, buffer_coord, write_region) })
 }
 
-/// \[[WriteConsoleOutputAttribute]\] Copies a number of character attributes to consecutive cells of a console screen buffer, beginning at a specified location.
+#[doc(alias = "WriteConsoleOutputAttribute")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/writeconsoleoutputattribute)\]
+/// Copies a number of character attributes to consecutive cells of a console screen buffer, beginning at a specified location.
 ///
 /// ### Example
 /// ```
@@ -684,7 +729,6 @@ pub fn write_console_output(console_output: &mut impl AsConsoleOutputHandle, buf
 /// # })();
 /// ```
 ///
-/// [WriteConsoleOutputAttribute]:  https://docs.microsoft.com/en-us/windows/console/writeconsoleoutputattribute
 pub fn write_console_output_attribute(console_output: &mut impl AsConsoleOutputHandle, attributes: &[Attributes], write_coord: impl IntoCoord) -> io::Result<usize> {
     let length = attributes.len().try_into().unwrap_or(!0);
     let mut written = 0;
@@ -692,7 +736,10 @@ pub fn write_console_output_attribute(console_output: &mut impl AsConsoleOutputH
     Ok(written as _)
 }
 
-/// \[[WriteConsoleOutputCharacterW]\] Copies a number of characters to consecutive cells of a console screen buffer, beginning at a specified location.
+#[doc(alias = "WriteConsoleOutputCharacter")]
+#[doc(alias = "WriteConsoleOutputCharacterW")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/writeconsoleoutputcharacter)\]
+/// Copies a number of characters to consecutive cells of a console screen buffer, beginning at a specified location.
 ///
 /// ### Example
 /// ```
@@ -704,7 +751,6 @@ pub fn write_console_output_attribute(console_output: &mut impl AsConsoleOutputH
 /// # })();
 /// ```
 ///
-/// [WriteConsoleOutputCharacterW]: https://docs.microsoft.com/en-us/windows/console/writeconsoleoutputcharacter
 pub fn write_console_output_character(console_output: &mut impl AsConsoleOutputHandle, characters: &[u16], write_coord: impl IntoCoord) -> io::Result<usize> {
     let length = characters.len().try_into().unwrap_or(!0);
     let mut written = 0;

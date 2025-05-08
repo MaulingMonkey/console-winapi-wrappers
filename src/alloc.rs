@@ -13,8 +13,9 @@ use std::os::windows::io::{AsRawHandle, RawHandle};
 
 
 
-
-/// \[[AllocConsole]\] Allocates a new console for the calling process.
+#[doc(alias = "AllocConsole")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/allocconsole)\]
+/// Allocates a new console for the calling process.
 ///
 /// ### Example
 /// ```
@@ -28,14 +29,15 @@ use std::os::windows::io::{AsRawHandle, RawHandle};
 /// assert_eq!(err.kind(), std::io::ErrorKind::PermissionDenied);
 /// ```
 ///
-/// [AllocConsole]:                     https://docs.microsoft.com/en-us/windows/console/allocconsole
 pub fn alloc_console() -> io::Result<()> {
     succeeded_to_result(unsafe{AllocConsole()})
 }
 
 
 
-/// \[[AttachConsole]\] Attaches the calling process to the console of the specified process.
+#[doc(alias = "AttachConsole")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/attachconsole)\]
+/// Attaches the calling process to the console of the specified process.
 ///
 /// ### Example
 /// ```
@@ -50,13 +52,14 @@ pub fn alloc_console() -> io::Result<()> {
 /// assert_eq!(err.kind(), std::io::ErrorKind::PermissionDenied);
 /// ```
 ///
-/// [AttachConsole]:                    https://docs.microsoft.com/en-us/windows/console/attachconsole
 pub fn attach_console(process: impl IntoProcessId) -> io::Result<()> {
     let process = process.into_process_id();
     succeeded_to_result(unsafe{AttachConsole(process)})
 }
 
-/// \[[AttachConsole]\] Attaches the calling process to the console of the parent process.
+#[doc(alias = "AttachConsole")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/attachconsole)\]
+/// Attaches the calling process to the console of the parent process.
 ///
 /// ### Example
 /// ```
@@ -71,7 +74,6 @@ pub fn attach_console(process: impl IntoProcessId) -> io::Result<()> {
 /// assert_eq!(err.kind(), std::io::ErrorKind::PermissionDenied);
 /// ```
 ///
-/// [AttachConsole]:                    https://docs.microsoft.com/en-us/windows/console/attachconsole
 pub fn attach_console_parent_process() -> io::Result<()> {
     succeeded_to_result(unsafe{AttachConsole(ATTACH_PARENT_PROCESS)})
 }
@@ -79,28 +81,31 @@ pub fn attach_console_parent_process() -> io::Result<()> {
 
 
 // TODO: psuedoconsoles?
-// https://docs.microsoft.com/en-us/windows/console/creating-a-pseudoconsole-session
+// https://learn.microsoft.com/en-us/windows/console/creating-a-pseudoconsole-session
+// see prior art in <https://github.com/MaulingMonkey/firehazard>
 //
 // | [CreatePseudoConsole]             | ![x] Allocates a new pseudoconsole for the calling process.
 // | [ClosePseudoConsole]              | ![x] Closes a pseudoconsole from the given handle.
 // | [ResizePseudoConsole]             | ![x]
 //
-// [CreatePseudoConsole]:              https://docs.microsoft.com/en-us/windows/console/createpseudoconsole
-// [ClosePseudoConsole]:               https://docs.microsoft.com/en-us/windows/console/closepseudoconsole
-// [ResizePseudoConsole]:              https://docs.microsoft.com/en-us/windows/console/resizepseudoconsole
+// [CreatePseudoConsole]:              https://learn.microsoft.com/en-us/windows/console/createpseudoconsole
+// [ClosePseudoConsole]:               https://learn.microsoft.com/en-us/windows/console/closepseudoconsole
+// [ResizePseudoConsole]:              https://learn.microsoft.com/en-us/windows/console/resizepseudoconsole
 
 
 
-/// \[[docs.microsoft.com]\] An owned win32 console screen buffer (2D grid of characters/glyphs)
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/createconsolescreenbuffer)\]
+/// An owned win32 console screen buffer (2D grid of characters/glyphs)
 ///
-/// [docs.microsoft.com]:        https://docs.microsoft.com/en-us/windows/console/createconsolescreenbuffer
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ConsoleScreenBuffer {
     handle: HANDLE,
 }
 
 impl ConsoleScreenBuffer {
-    /// <code>[CreateConsoleScreenBuffer]\(0, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL\)</code> Creates a console screen buffer.
+    #[doc(alias = "CreateConsoleScreenBuffer")]
+    /// <code>[CreateConsoleScreenBuffer](https://learn.microsoft.com/en-us/windows/console/createconsolescreenbuffer)\(0, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL\)</code>
+    /// Creates a console screen buffer.
     ///
     /// ### Example
     /// ```
@@ -108,7 +113,6 @@ impl ConsoleScreenBuffer {
     /// let csb = ConsoleScreenBuffer::new().unwrap();
     /// ```
     ///
-    /// [CreateConsoleScreenBuffer]:        https://docs.microsoft.com/en-us/windows/console/createconsolescreenbuffer
     pub fn new() -> io::Result<Self> {
         match unsafe { CreateConsoleScreenBuffer(0, 0, null(), CONSOLE_TEXTMODE_BUFFER, null_mut()) } {
             handleapi::INVALID_HANDLE_VALUE => Err(io::Error::last_os_error()),
@@ -122,10 +126,11 @@ impl AsRawHandle for ConsoleScreenBuffer {
     fn as_raw_handle(&self) -> RawHandle { self.handle.cast() }
 }
 
-/// \[[DuplicateHandle]\] Duplicates an object handle.
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-duplicatehandle)\]
+/// Duplicates an object handle.
 ///
-/// [DuplicateHandle]:  https://docs.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-duplicatehandle
 impl Clone for ConsoleScreenBuffer {
+    #[doc(alias = "DuplicateHandle")]
     fn clone(&self) -> Self {
         let current_process = unsafe { GetCurrentProcess() };
         let mut handle = null_mut();
@@ -135,10 +140,11 @@ impl Clone for ConsoleScreenBuffer {
     }
 }
 
-/// \[[CloseHandle]\] Closes an open object handle.
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-closehandle)\]
+/// Closes an open object handle.
 ///
-/// [CloseHandle]:  https://docs.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-closehandle
 impl Drop for ConsoleScreenBuffer {
+    #[doc(alias = "CloseHandle")]
     fn drop(&mut self) {
         let _succeeded = unsafe { CloseHandle(self.handle) };
         debug_assert!(_succeeded != 0, "ConsoleScreenBuffer::drop(): CloseHandle(self.handle) failed: {:?}", io::Error::last_os_error());
@@ -154,10 +160,13 @@ impl Drop for ConsoleScreenBuffer {
 
 
 
-/// \[[FreeConsole]\] Detaches the calling process from its console.
+#[doc(alias = "FreeConsole")]
+/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/freeconsole)\]
+/// Detaches the calling process from its console.
 ///
 /// This function may return `Ok(())`, even if the calling process wasn't attached to a console, despite
-/// [docs.microsoft.com]'s remarks suggesting that `ERROR_INVALID_PARAMETER` should occur.
+/// [the documentation's remarks](https://learn.microsoft.com/en-us/windows/console/freeconsole#remarks)
+/// suggesting that `ERROR_INVALID_PARAMETER` should occur.
 ///
 /// ### Example
 /// ```
@@ -165,8 +174,6 @@ impl Drop for ConsoleScreenBuffer {
 /// let _ = free_console();
 /// ```
 ///
-/// [docs.microsoft.com]:               https://docs.microsoft.com/en-us/windows/console/freeconsole
-/// [FreeConsole]:                      https://docs.microsoft.com/en-us/windows/console/freeconsole
 pub fn free_console() -> io::Result<()> {
     succeeded_to_result(unsafe{FreeConsole()})
 }
