@@ -47,7 +47,7 @@ impl From<CodePage> for UINT { fn from(value: CodePage) -> Self { value.0 } }
 
 #[doc(alias = "GetConsoleCP")]
 /// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsolecp)\]
-/// Retrieves the input code page used by the console associated with the calling process.
+/// Retrieves the current console's input code page.
 ///
 /// A console uses its input code page to translate keyboard input into the corresponding character value.
 ///
@@ -66,7 +66,7 @@ pub fn get_console_input_cp() -> io::Result<CodePage> {
 
 #[doc(alias = "GetConsoleOutputCP")]
 /// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsoleoutputcp)\]
-/// Retrieves the output code page used by the console associated with the calling process.
+/// Retrieves the current console's output code page.
 ///
 /// A console uses its output code page to translate the character values written by the various output functions into the images displayed in the console window.
 ///
@@ -85,7 +85,7 @@ pub fn get_console_output_cp() -> io::Result<CodePage> {
 
 #[doc(alias = "SetConsoleCP")]
 /// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/setconsolecp)\]
-/// Sets the input code page used by the console associated with the calling process.
+/// Sets the input code page of the current console.
 ///
 /// A console uses its input code page to translate keyboard input into the corresponding character value.
 ///
@@ -104,7 +104,7 @@ pub fn set_console_input_cp(codepage: impl Into<CodePage>) -> io::Result<()> {
 
 #[doc(alias = "SetConsoleOutputCP")]
 /// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/setconsoleoutputcp)\]
-/// Sets the output code page used by the console associated with the calling process.
+/// Sets the output code page of the current console.
 ///
 /// A console uses its output code page to translate the character values written by the various output functions into the images displayed in the console window.
 ///
@@ -124,7 +124,7 @@ pub fn set_console_output_cp(codepage: impl Into<CodePage>) -> io::Result<()> {
 
 
 /// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/setconsolecp)\]
-/// Sets the input code page for the duration of the scope, restoring the previous code page when dropped.
+/// Sets the input code page, then restores the previous code page on drop.
 ///
 /// ### Example
 /// ```
@@ -143,7 +143,7 @@ pub fn set_console_output_cp(codepage: impl Into<CodePage>) -> io::Result<()> {
 #[derive(Debug)] pub struct InputCodePageScope  { old: CodePage }
 
 /// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/setconsoleoutputcp)\]
-/// Sets the output code page for the duration of the scope, restoring the previous code page when dropped.
+/// Sets the output code page, then restores the previous code page on drop.
 ///
 /// ### Example
 /// ```

@@ -6,7 +6,7 @@ use std::ops::*;
 
 
 /// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/console-screen-buffers#character-attributes)\]
-/// Character attributes can be divided into two classes: color and DBCS. The following attributes are defined in the WinCon.h header file.
+/// 4-bit foreground and background color, plus text decoration.
 #[repr(transparent)] #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)] pub struct Attributes(WORD);
 
 

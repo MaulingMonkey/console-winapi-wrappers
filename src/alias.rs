@@ -39,7 +39,7 @@ pub fn add_console_alias(source: impl AsRef<OsStr>, target: impl AsRef<OsStr>, e
 #[doc(alias = "AddConsoleAlias")]
 #[doc(alias = "AddConsoleAliasW")]
 /// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/addconsolealias)\]
-/// Defines a console alias for the specified executable.
+/// Clears a console alias for the specified executable.
 ///
 /// ### Example
 /// ```no_run
@@ -236,7 +236,7 @@ pub fn get_console_aliases_os<'t>(exe_name: impl AsRef<OsStr>) -> io::Result<imp
 #[doc(alias = "GetConsoleAliasesLength")]
 #[doc(alias = "GetConsoleAliasesLengthW")]
 /// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsolealiaseslength)\]
-/// Retrieves the required size for the buffer used by the [get_console_aliases] function.
+/// Retrieves the buffer size required for [get_console_aliases].
 ///
 pub fn get_console_aliases_length(exe_name: impl AsRef<OsStr>) -> TextLength {
     unsafe { get_console_aliases_length_impl(&mut widen0(exe_name)) }
@@ -306,7 +306,7 @@ pub fn get_console_alias_exes_os() -> io::Result<impl Iterator<Item = OsString>>
 #[doc(alias = "GetConsoleAliasExesLength")]
 #[doc(alias = "GetConsoleAliasExesLengthW")]
 /// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsolealiasexeslength)\]
-/// Retrieves the required size for the buffer used by the [get_console_alias_exes] function.
+/// Retrieves the buffer size required for [get_console_alias_exes].
 ///
 pub fn get_console_alias_exes_length() -> TextLength {
     TextLength(unsafe { GetConsoleAliasExesLengthW() as _ })

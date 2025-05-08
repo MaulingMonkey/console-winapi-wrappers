@@ -59,7 +59,9 @@ pub fn get_console_title() -> io::Result<OsString> {
 
 #[doc(alias = "GetConsoleWindow")]
 /// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getconsolewindow)\]
-/// Retrieves the window handle used by the console associated with the calling process.
+/// Retrieves the current console's window handle.
+///
+/// Note that this almost certainly belongs to another process (`cmd.exe`, which may be a parent, child, or unrelated process.)
 ///
 /// ### Example
 /// ```
@@ -81,7 +83,7 @@ pub fn get_console_window() -> io::Result<HWND> {
 
 #[doc(alias = "GetLargestConsoleWindowSize")]
 /// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/getlargestconsolewindowsize)\]
-/// Retrieves the size of the largest possible console window, based on the current font and the size of the display.
+/// Calculates the largest possible window, given the current font &amp; display.
 ///
 /// ### Example
 /// ```

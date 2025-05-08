@@ -61,7 +61,7 @@ pub fn set_console_mode<CH: AsConsoleHandle>(handle: &mut CH, mode: CH::Mode) ->
 #[doc(alias = "GetConsoleMode")]
 #[doc(alias = "SetConsoleMode")]
 /// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/setconsolemode)\]
-/// Retrieves and changes the current mode of a console's input or screen buffer.
+/// Modifies the existing mode of a console's input or screen buffer.
 ///
 /// ### Example
 /// ```
