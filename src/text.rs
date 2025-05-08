@@ -88,6 +88,19 @@ impl<'a> Iterator for TextNsvRef<'a> {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)] pub struct TextLength(pub(crate) usize);
 
 impl TextLength {
+    /// Return the length of the text, in bytes.
     pub fn bytes(&self) -> usize { self.0 }
-    pub fn wchars(&self) -> usize { (self.0/2) + (self.0&1) }
+
+    #[deprecated = "prefer `wchars_ceil` (this fn's current behavior) or `wchars_floor`"]
+    pub fn wchars(&self) -> usize { self.wchars_ceil() }
+
+    /// Return the length of the text, in *complete* wide characters.
+    /// If the length is in an odd number of bytes, this will round down.
+    ///
+    pub fn wchars_floor(&self) -> usize { self.0/2 }
+
+    /// Return the length of the text, in wide characters, including partial ones.
+    /// If the length is in an odd number of bytes, this will round up.
+    ///
+    pub fn wchars_ceil(&self) -> usize { (self.0/2) + (self.0&1) }
 }

@@ -157,7 +157,7 @@ pub fn get_console_alias_os(source: impl AsRef<OsStr>, exe_name: impl AsRef<OsSt
 /// # use maulingmonkey_console_winapi_wrappers::*;
 /// # let _ = (|| -> std::io::Result<()> {
 /// let exe = "cmd.exe";
-/// let mut aliases = vec![0u16; get_console_aliases_length(exe).wchars()];
+/// let mut aliases = vec![0u16; get_console_aliases_length(exe).wchars_ceil()];
 /// for alias in get_console_aliases(&mut aliases, exe)? {
 ///     dbg!(alias.to_os_string());
 /// }
@@ -221,7 +221,7 @@ unsafe fn get_console_aliases_impl<'t>(alias_buffer: &'t mut [u16], exe_name: &m
 pub fn get_console_aliases_os<'t>(exe_name: impl AsRef<OsStr>) -> io::Result<impl Iterator<Item = OsString>> {
     let mut exe_name    = widen0(exe_name); // unmodified, GetConsoleAliasesW just has bad const qualifications
 
-    let mut buf = vec![0u16; unsafe { get_console_aliases_length_impl(&mut exe_name) }.wchars()];
+    let mut buf = vec![0u16; unsafe { get_console_aliases_length_impl(&mut exe_name) }.wchars_ceil()];
     loop {
         buf.resize(buf.capacity(), 0);
         match unsafe { get_console_aliases_impl(&mut buf, &mut exe_name) } {
@@ -260,7 +260,7 @@ unsafe fn get_console_aliases_length_impl(exe_name: &mut [u16]) -> TextLength {
 /// ```
 /// # use maulingmonkey_console_winapi_wrappers::*;
 /// # let _ = (|| -> std::io::Result<()> {
-/// let mut exes = vec![0u16; get_console_alias_exes_length().wchars()];
+/// let mut exes = vec![0u16; get_console_alias_exes_length().wchars_ceil()];
 /// for exe in get_console_alias_exes(&mut exes)? {
 ///     dbg!(exe.to_os_string());
 /// }
@@ -291,7 +291,7 @@ pub fn get_console_alias_exes(exe_name_buffer: &mut impl AsMut<[u16]>) -> io::Re
 /// ```
 ///
 pub fn get_console_alias_exes_os() -> io::Result<impl Iterator<Item = OsString>> {
-    let mut buf = vec![0u16; get_console_alias_exes_length().wchars()];
+    let mut buf = vec![0u16; get_console_alias_exes_length().wchars_ceil()];
     loop {
         buf.resize(buf.capacity(), 0);
         match get_console_alias_exes(&mut buf) {
@@ -423,7 +423,7 @@ pub fn get_console_alias_exes_length() -> TextLength {
     assert_eq!(aliases[2], "test=equal=value=value");
 
     set_err_1();
-    assert_eq!(get_console_aliases_length(exe).wchars(), aliases.iter().map(|a| a.len()+1).sum());
+    assert_eq!(get_console_aliases_length(exe).wchars_floor(), aliases.iter().map(|a| a.len()+1).sum());
 
     set_err_1();
     let mut exes = [0u16; 512];
