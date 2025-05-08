@@ -1,3 +1,5 @@
+use bytemuck::{Pod, Zeroable};
+
 use winapi::shared::minwindef::WORD;
 use winapi::um::wincon;
 
@@ -7,7 +9,7 @@ use std::ops::*;
 
 /// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/console-screen-buffers#character-attributes)\]
 /// 4-bit foreground and background color, plus text decoration.
-#[repr(transparent)] #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)] pub struct Attributes(WORD);
+#[repr(transparent)] #[derive(Clone, Copy, Pod, Debug, Default, Zeroable, PartialEq, Eq, PartialOrd, Ord, Hash)] pub struct Attributes(WORD);
 
 
 
