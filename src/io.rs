@@ -293,6 +293,7 @@ pub fn peek_console_input<'i>(console_input: &impl AsConsoleInputHandle) -> io::
     let mut buffer : [INPUT_RECORD; N] = unsafe { zeroed() };
     let mut read = 0;
     succeeded_to_result(unsafe { PeekConsoleInputW(console_input.as_raw_handle().cast(), buffer.as_mut_ptr(), N as _, &mut read) })?;
+    #[allow(deprecated)] // avoid bumping MSRV
     Ok(std::array::IntoIter::new(buffer).take(read as _))
 }
 
@@ -392,6 +393,7 @@ pub fn read_console_input<'i>(console_input: &mut impl AsConsoleInputHandle) -> 
     let mut buffer : [INPUT_RECORD; N] = unsafe { zeroed() };
     let mut read = 0;
     succeeded_to_result(unsafe { ReadConsoleInputW(console_input.as_raw_handle().cast(), buffer.as_mut_ptr(), N as _, &mut read) })?;
+    #[allow(deprecated)] // avoid bumping MSRV
     Ok(std::array::IntoIter::new(buffer).take(read as _))
 }
 
