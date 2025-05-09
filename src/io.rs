@@ -91,16 +91,16 @@ pub fn flush_console_input_buffer(console_input: &mut impl AsConsoleInputHandle)
 /// # use std::io::{self, *};
 /// # let _ = (|| -> io::Result<()> {
 /// let info = get_console_cursor_info(&stdout())?;
-/// assert!((1 ..= 100).contains(&info.dwSize));
-/// assert!((0 ..= 1).contains(&info.bVisible));
+/// assert!((1 ..= 100).contains(&info.size));
+/// assert!((false ..= true).contains(&info.visible));
 /// # Ok(())
 /// # })();
 /// ```
 ///
-pub fn get_console_cursor_info(console_output: &impl AsConsoleOutputHandle) -> io::Result<CONSOLE_CURSOR_INFO> {
-    let mut info : CONSOLE_CURSOR_INFO = unsafe { zeroed() };
+pub fn get_console_cursor_info(console_output: &impl AsConsoleOutputHandle) -> io::Result<ConsoleCursorInfo> {
+    let mut info = CONSOLE_CURSOR_INFO::default();
     succeeded_to_result(unsafe { GetConsoleCursorInfo(console_output.as_raw_handle().cast(), &mut info) })?;
-    Ok(info)
+    Ok(info.into())
 }
 
 #[doc(alias = "GetConsoleDisplayMode")]
@@ -536,14 +536,13 @@ pub fn set_console_active_screen_buffer(console_output: &impl AsConsoleOutputHan
 /// # use maulingmonkey_console_winapi_wrappers::*;
 /// # use std::io::{self, *};
 /// # let _ = (|| -> io::Result<()> {
-/// use winapi::um::wincon::CONSOLE_CURSOR_INFO;
-/// set_console_cursor_info(&mut stdout(), CONSOLE_CURSOR_INFO { dwSize: 100, bVisible: 1 })?;
+/// set_console_cursor_info(&mut stdout(), ConsoleCursorInfo::new(100, true))?;
 /// # Ok(())
 /// # })();
 /// ```
 ///
-pub fn set_console_cursor_info(console_output: &mut impl AsConsoleOutputHandle, info: impl Into<CONSOLE_CURSOR_INFO>) -> io::Result<()> {
-    let mut info = info.into();
+pub fn set_console_cursor_info(console_output: &mut impl AsConsoleOutputHandle, info: impl Into<ConsoleCursorInfo>) -> io::Result<()> {
+    let mut info : CONSOLE_CURSOR_INFO = info.into().into();
 
     // Sanitize
     if info.dwSize < 1   { info.dwSize = 1;   }
