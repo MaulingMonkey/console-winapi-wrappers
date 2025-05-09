@@ -35,7 +35,7 @@ const _ : () = {
     assert!(offset_of!(CharInfo, char) == offset_of!(CHAR_INFO, Char));
 };
 
-#[test] fn char_info_layout() {
+#[test] fn layout() {
     let a = CharInfo::new(0x1234, Zeroable::zeroed());
     let b : CHAR_INFO = a.into();
     assert_eq!(a.char.ascii_char(),     unsafe { *b.Char.AsciiChar() } as u8);
