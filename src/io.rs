@@ -1,95 +1,13 @@
 use crate::*;
 
-use bytemuck::{Pod, Zeroable};
-
 use winapi::shared::minwindef::DWORD;
 use winapi::um::consoleapi::*;
 use winapi::um::wincon::*;
 
 use std::convert::*;
 use std::io;
-use std::mem::{align_of, size_of, size_of_val, offset_of, zeroed};
+use std::mem::{size_of_val, zeroed};
 use std::ptr::*;
-
-
-
-#[doc(alias = "CHAR_INFO::Char")]
-/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/char-info-str)\]
-/// union { ascii_char: u8, unicode_char: u16 }
-///
-#[derive(Clone, Copy, Pod, Default, Zeroable, PartialEq, Eq, PartialOrd, Ord, Hash)] #[repr(transparent)] pub struct AsciiOrUnicodeChar(u16);
-
-impl AsciiOrUnicodeChar {
-    pub const fn from_ascii_char(ascii: u8) -> Self {
-        Self(u16::from_ne_bytes([ascii, 0]))
-    }
-
-    pub const fn from_unicode_char(unicode: u16) -> Self {
-        Self(unicode)
-    }
-
-    pub const fn ascii_char(self) -> u8 {
-        let [ascii, _] = self.0.to_ne_bytes();
-        ascii
-    }
-
-    pub const fn unicode_char(self) -> u16 {
-        self.0
-    }
-}
-
-impl From<u8 > for AsciiOrUnicodeChar { fn from(value: u8 ) -> Self { Self::from_ascii_char  (value) } }
-impl From<u16> for AsciiOrUnicodeChar { fn from(value: u16) -> Self { Self::from_unicode_char(value) } }
-//pl From<AsciiOrUnicodeChar> for u8  { fn from(value: AsciiOrUnicodeChar) -> Self { value.ascii_char() } } // lossy, intentionally omitted
-impl From<AsciiOrUnicodeChar> for u16 { fn from(value: AsciiOrUnicodeChar) -> Self { value.unicode_char() } }
-
-impl core::fmt::Debug for AsciiOrUnicodeChar {
-    fn fmt(&self, fmt: &mut core::fmt::Formatter) -> core::fmt::Result {
-        let unit = self.unicode_char();
-        if let Ok(ch) = char::try_from(u32::from(unit)) {
-            core::fmt::Debug::fmt(&ch, fmt)
-        } else {
-            write!(fmt, "'\\u{{{unit:04X}}}'")
-        }
-    }
-}
-
-
-
-#[doc(alias = "CHAR_INFO")]
-/// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/char-info-str)\]
-/// struct { char: [AsciiOrUnicodeChar], attributes: [Attributes] }
-///
-#[derive(Clone, Copy, Pod, Default, Zeroable, Debug, PartialEq, Eq)] // PartialOrd, Ord, Hash?
-#[repr(C)] pub struct CharInfo {
-    pub char:           AsciiOrUnicodeChar,
-    pub attributes:     Attributes,
-}
-
-impl CharInfo {
-    pub const fn new(char: u16, attributes: Attributes) -> Self {
-        Self {
-            char: AsciiOrUnicodeChar::from_unicode_char(char),
-            attributes
-        }
-    }
-}
-
-impl From<CharInfo> for CHAR_INFO { fn from(value: CharInfo ) -> Self { unsafe { core::mem::transmute(value) } } }
-impl From<CHAR_INFO> for CharInfo { fn from(value: CHAR_INFO) -> Self { unsafe { core::mem::transmute(value) } } }
-
-const _ : () = {
-    assert!(align_of::<CHAR_INFO>() == align_of::<CharInfo>());
-    assert!(size_of ::<CHAR_INFO>() == size_of ::<CharInfo>());
-    assert!(offset_of!(CharInfo, char) == offset_of!(CHAR_INFO, Char));
-};
-
-#[test] fn char_info_layout() {
-    let a = CharInfo::new(0x1234, Zeroable::zeroed());
-    let b : CHAR_INFO = a.into();
-    assert_eq!(a.char.ascii_char(),     unsafe { *b.Char.AsciiChar() } as u8);
-    assert_eq!(a.char.unicode_char(),   unsafe { *b.Char.UnicodeChar() });
-}
 
 
 
