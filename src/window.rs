@@ -137,6 +137,6 @@ pub fn set_console_title(title: impl AsRef<OsStr>) -> io::Result<()> {
 /// # })();
 /// ```
 ///
-pub fn set_console_window_info(console_output: &mut impl AsConsoleOutputHandle, absolute: bool, console_window: impl IntoSmallRect) -> io::Result<()> {
-    succeeded_to_result(unsafe { SetConsoleWindowInfo(console_output.as_raw_handle().cast(), absolute.into(), &console_window.into_small_rect()) })
+pub fn set_console_window_info(console_output: &mut impl AsConsoleOutputHandle, absolute: bool, console_window: impl Into<SmallRect>) -> io::Result<()> {
+    succeeded_to_result(unsafe { SetConsoleWindowInfo(console_output.as_raw_handle().cast(), absolute.into(), &console_window.into().into()) })
 }

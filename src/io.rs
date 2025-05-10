@@ -29,10 +29,10 @@ pub fn fill_console_output_attribute(
     console_output: &mut impl AsConsoleOutputHandle,
     attribute:      impl Into<Attributes>,
     length:         DWORD,
-    write_coord:    impl IntoCoord,
+    write_coord:    impl Into<Coord>,
 ) -> io::Result<DWORD> {
     let mut written = 0;
-    succeeded_to_result(unsafe { FillConsoleOutputAttribute(console_output.as_raw_handle().cast(), attribute.into().into(), length, write_coord.into_coord(), &mut written) })?;
+    succeeded_to_result(unsafe { FillConsoleOutputAttribute(console_output.as_raw_handle().cast(), attribute.into().into(), length, write_coord.into().into(), &mut written) })?;
     Ok(written)
 }
 
@@ -55,11 +55,11 @@ pub fn fill_console_output_character(
     console_output: &mut impl AsConsoleOutputHandle,
     character:      char,
     length:         DWORD,
-    write_coord:    impl IntoCoord,
+    write_coord:    impl Into<Coord>,
 ) -> io::Result<DWORD> {
     let character = u16::try_from(character as u32).map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "fill_console_output_character: `character` exceeds maximum codepoint U+FFFF"))?;
     let mut written = 0;
-    succeeded_to_result(unsafe { FillConsoleOutputCharacterW(console_output.as_raw_handle().cast(), character, length, write_coord.into_coord(), &mut written) })?;
+    succeeded_to_result(unsafe { FillConsoleOutputCharacterW(console_output.as_raw_handle().cast(), character, length, write_coord.into().into(), &mut written) })?;
     Ok(written)
 }
 
@@ -438,10 +438,10 @@ pub fn read_console_input_one<'i>(console_input: &mut impl AsConsoleInputHandle)
 /// # })();
 /// ```
 ///
-pub fn read_console_output(console_output: &impl AsConsoleOutputHandle, buffer: &mut [CharInfo], buffer_size: impl IntoCoord, buffer_coord: impl IntoCoord, read_region: &mut SMALL_RECT) -> io::Result<()> {
+pub fn read_console_output(console_output: &impl AsConsoleOutputHandle, buffer: &mut [CharInfo], buffer_size: impl Into<Coord>, buffer_coord: impl Into<Coord>, read_region: &mut SMALL_RECT) -> io::Result<()> {
     let console_output = console_output.as_raw_handle().cast();
-    let buffer_size = buffer_size.into_coord();
-    let buffer_coord = buffer_coord.into_coord();
+    let buffer_size  : COORD = buffer_size.into().into();
+    let buffer_coord : COORD = buffer_coord.into().into();
 
     // Bounds checking
     if buffer_coord.X > buffer_size.X { return Err(io::Error::new(io::ErrorKind::InvalidInput, "read_console_output(): buffer_coord.X > buffer_size.X")); }
@@ -470,10 +470,10 @@ pub fn read_console_output(console_output: &impl AsConsoleOutputHandle, buffer: 
 /// # })();
 /// ```
 ///
-pub fn read_console_output_attribute<'a>(console_output: &impl AsConsoleOutputHandle, attributes: &'a mut [Attributes], read_coord: impl IntoCoord) -> io::Result<&'a [Attributes]> {
+pub fn read_console_output_attribute<'a>(console_output: &impl AsConsoleOutputHandle, attributes: &'a mut [Attributes], read_coord: impl Into<Coord>) -> io::Result<&'a [Attributes]> {
     let console_output = console_output.as_raw_handle().cast();
     let length : DWORD = attributes.len().try_into().unwrap_or(!0);
-    let read_coord = read_coord.into_coord();
+    let read_coord = read_coord.into().into();
 
     let mut read = 0;
     succeeded_to_result(unsafe { ReadConsoleOutputAttribute(console_output, attributes.as_mut_ptr().cast(), length, read_coord, &mut read) })?;
@@ -496,10 +496,10 @@ pub fn read_console_output_attribute<'a>(console_output: &impl AsConsoleOutputHa
 /// # })();
 /// ```
 ///
-pub fn read_console_output_character<'a>(console_output: &impl AsConsoleOutputHandle, characters: &'a mut [u16], read_coord: impl IntoCoord) -> io::Result<&'a [u16]> {
+pub fn read_console_output_character<'a>(console_output: &impl AsConsoleOutputHandle, characters: &'a mut [u16], read_coord: impl Into<Coord>) -> io::Result<&'a [u16]> {
     let console_output = console_output.as_raw_handle().cast();
     let length : DWORD = characters.len().try_into().unwrap_or(!0);
-    let read_coord = read_coord.into_coord();
+    let read_coord = read_coord.into().into();
 
     let mut read = 0;
     succeeded_to_result(unsafe { ReadConsoleOutputCharacterW(console_output, characters.as_mut_ptr(), length, read_coord, &mut read) })?;
@@ -566,8 +566,8 @@ pub fn set_console_cursor_info(console_output: &mut impl AsConsoleOutputHandle, 
 /// # })();
 /// ```
 ///
-pub fn set_console_cursor_position(console_output: &mut impl AsConsoleOutputHandle, cursor_position: impl IntoCoord) -> io::Result<()> {
-    succeeded_to_result(unsafe { SetConsoleCursorPosition(console_output.as_raw_handle().cast(), cursor_position.into_coord()) })
+pub fn set_console_cursor_position(console_output: &mut impl AsConsoleOutputHandle, cursor_position: impl Into<Coord>) -> io::Result<()> {
+    succeeded_to_result(unsafe { SetConsoleCursorPosition(console_output.as_raw_handle().cast(), cursor_position.into().into()) })
 }
 
 // TODO: SetConsoleDisplayMode
@@ -592,8 +592,8 @@ pub fn set_console_cursor_position(console_output: &mut impl AsConsoleOutputHand
 /// # })();
 /// ```
 ///
-pub fn set_console_screen_buffer_size(console_output: &mut impl AsConsoleOutputHandle, size: impl IntoCoord) -> io::Result<()> {
-    succeeded_to_result(unsafe { SetConsoleScreenBufferSize(console_output.as_raw_handle().cast(), size.into_coord()) })
+pub fn set_console_screen_buffer_size(console_output: &mut impl AsConsoleOutputHandle, size: impl Into<Coord>) -> io::Result<()> {
+    succeeded_to_result(unsafe { SetConsoleScreenBufferSize(console_output.as_raw_handle().cast(), size.into().into()) })
 }
 
 #[doc(alias = "SetConsoleTextAttribute")]
@@ -699,10 +699,10 @@ pub fn write_console_input(console_input: &mut impl AsConsoleInputHandle, buffer
 /// # })();
 /// ```
 ///
-pub fn write_console_output(console_output: &mut impl AsConsoleOutputHandle, buffer: &[CharInfo], buffer_size: impl IntoCoord, buffer_coord: impl IntoCoord, write_region: &mut SMALL_RECT) -> io::Result<()> {
+pub fn write_console_output(console_output: &mut impl AsConsoleOutputHandle, buffer: &[CharInfo], buffer_size: impl Into<Coord>, buffer_coord: impl Into<Coord>, write_region: &mut SMALL_RECT) -> io::Result<()> {
     let console_output = console_output.as_raw_handle().cast();
-    let buffer_size = buffer_size.into_coord();
-    let buffer_coord = buffer_coord.into_coord();
+    let buffer_size  : COORD = buffer_size.into().into();
+    let buffer_coord : COORD = buffer_coord.into().into();
 
     // Bounds checking
     if buffer_coord.X > buffer_size.X { return Err(io::Error::new(io::ErrorKind::InvalidInput, "write_console_output(): buffer_coord.X > buffer_size.X")); }
@@ -730,10 +730,10 @@ pub fn write_console_output(console_output: &mut impl AsConsoleOutputHandle, buf
 /// # })();
 /// ```
 ///
-pub fn write_console_output_attribute(console_output: &mut impl AsConsoleOutputHandle, attributes: &[Attributes], write_coord: impl IntoCoord) -> io::Result<usize> {
+pub fn write_console_output_attribute(console_output: &mut impl AsConsoleOutputHandle, attributes: &[Attributes], write_coord: impl Into<Coord>) -> io::Result<usize> {
     let length = attributes.len().try_into().unwrap_or(!0);
     let mut written = 0;
-    succeeded_to_result(unsafe { WriteConsoleOutputAttribute(console_output.as_raw_handle().cast(), attributes.as_ptr().cast(), length, write_coord.into_coord(), &mut written) })?;
+    succeeded_to_result(unsafe { WriteConsoleOutputAttribute(console_output.as_raw_handle().cast(), attributes.as_ptr().cast(), length, write_coord.into().into(), &mut written) })?;
     Ok(written as _)
 }
 
@@ -752,9 +752,9 @@ pub fn write_console_output_attribute(console_output: &mut impl AsConsoleOutputH
 /// # })();
 /// ```
 ///
-pub fn write_console_output_character(console_output: &mut impl AsConsoleOutputHandle, characters: &[u16], write_coord: impl IntoCoord) -> io::Result<usize> {
+pub fn write_console_output_character(console_output: &mut impl AsConsoleOutputHandle, characters: &[u16], write_coord: impl Into<Coord>) -> io::Result<usize> {
     let length = characters.len().try_into().unwrap_or(!0);
     let mut written = 0;
-    succeeded_to_result(unsafe { WriteConsoleOutputCharacterW(console_output.as_raw_handle().cast(), characters.as_ptr(), length, write_coord.into_coord(), &mut written) })?;
+    succeeded_to_result(unsafe { WriteConsoleOutputCharacterW(console_output.as_raw_handle().cast(), characters.as_ptr(), length, write_coord.into().into(), &mut written) })?;
     Ok(written as _)
 }
