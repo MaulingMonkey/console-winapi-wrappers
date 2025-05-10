@@ -158,10 +158,10 @@ pub fn get_console_history_info() -> io::Result<CONSOLE_HISTORY_INFO> {
 /// # })();
 /// ```
 ///
-pub fn get_console_screen_buffer_info(console_output: &impl AsConsoleOutputHandle) -> io::Result<CONSOLE_SCREEN_BUFFER_INFO> {
+pub fn get_console_screen_buffer_info(console_output: &impl AsConsoleOutputHandle) -> io::Result<ConsoleScreenBufferInfo> {
     let mut info : CONSOLE_SCREEN_BUFFER_INFO = unsafe { zeroed() };
     succeeded_to_result(unsafe { GetConsoleScreenBufferInfo(console_output.as_raw_handle().cast(), &mut info) })?;
-    Ok(info)
+    Ok(info.into())
 }
 
 #[doc(alias = "GetConsoleScreenBufferInfoEx")]
@@ -178,11 +178,11 @@ pub fn get_console_screen_buffer_info(console_output: &impl AsConsoleOutputHandl
 /// # })();
 /// ```
 ///
-pub fn get_console_screen_buffer_info_ex(console_output: &impl AsConsoleOutputHandle) -> io::Result<CONSOLE_SCREEN_BUFFER_INFOEX> {
+pub fn get_console_screen_buffer_info_ex(console_output: &impl AsConsoleOutputHandle) -> io::Result<ConsoleScreenBufferInfoEx> {
     let mut info : CONSOLE_SCREEN_BUFFER_INFOEX = unsafe { zeroed() };
     info.cbSize = size_of_val(&info) as _;
     succeeded_to_result(unsafe { GetConsoleScreenBufferInfoEx(console_output.as_raw_handle().cast(), &mut info) })?;
-    Ok(info)
+    Ok(info.into())
 }
 
 #[doc(alias = "GetConsoleSelectionInfo")]
