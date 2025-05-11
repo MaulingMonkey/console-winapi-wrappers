@@ -1,3 +1,5 @@
+//! \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/console-structures)\]
+
 mod ascii_or_unicode_char;      pub use ascii_or_unicode_char::*;
 mod char_info;                  pub use char_info::*;
 mod color_ref;                  pub use color_ref::*;
