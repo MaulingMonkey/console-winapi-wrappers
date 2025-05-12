@@ -264,10 +264,10 @@ pub fn get_number_of_console_mouse_buttons() -> io::Result<usize> {
 /// # })();
 /// ```
 ///
-pub fn peek_console_input_with<'i>(console_input: &impl AsConsoleInputHandle, buffer: &'i mut [INPUT_RECORD]) -> io::Result<&'i [INPUT_RECORD]> {
+pub fn peek_console_input_with<'i>(console_input: &impl AsConsoleInputHandle, buffer: &'i mut [InputRecord]) -> io::Result<&'i [InputRecord]> {
     let length : DWORD = buffer.len().try_into().unwrap_or(!0);
     let mut read = 0;
-    succeeded_to_result(unsafe { PeekConsoleInputW(console_input.as_raw_handle().cast(), buffer.as_mut_ptr(), length, &mut read) })?;
+    succeeded_to_result(unsafe { PeekConsoleInputW(console_input.as_raw_handle().cast(), buffer.as_mut_ptr().cast(), length, &mut read) })?;
     Ok(&buffer[.. read as _])
 }
 
@@ -288,11 +288,11 @@ pub fn peek_console_input_with<'i>(console_input: &impl AsConsoleInputHandle, bu
 /// # })();
 /// ```
 ///
-pub fn peek_console_input<'i>(console_input: &impl AsConsoleInputHandle) -> io::Result<impl Iterator<Item = INPUT_RECORD>> {
+pub fn peek_console_input<'i>(console_input: &impl AsConsoleInputHandle) -> io::Result<impl Iterator<Item = InputRecord>> {
     const N : usize = 32;
-    let mut buffer : [INPUT_RECORD; N] = unsafe { zeroed() };
+    let mut buffer = [InputRecord::default(); N];
     let mut read = 0;
-    succeeded_to_result(unsafe { PeekConsoleInputW(console_input.as_raw_handle().cast(), buffer.as_mut_ptr(), N as _, &mut read) })?;
+    succeeded_to_result(unsafe { PeekConsoleInputW(console_input.as_raw_handle().cast(), buffer.as_mut_ptr().cast(), N as _, &mut read) })?;
     #[allow(deprecated)] // avoid bumping MSRV
     Ok(std::array::IntoIter::new(buffer).take(read as _))
 }
@@ -314,8 +314,8 @@ pub fn peek_console_input<'i>(console_input: &impl AsConsoleInputHandle) -> io::
 /// # })();
 /// ```
 ///
-pub fn peek_console_input_one(console_input: &impl AsConsoleInputHandle) -> io::Result<Option<INPUT_RECORD>> {
-    let mut record : INPUT_RECORD = unsafe { zeroed() };
+pub fn peek_console_input_one(console_input: &impl AsConsoleInputHandle) -> io::Result<Option<InputRecord>> {
+    let mut record = InputRecord::default();
     let empty = peek_console_input_with(console_input, std::slice::from_mut(&mut record))?.is_empty();
     Ok(if empty { None } else { Some(record) })
 }
@@ -364,10 +364,10 @@ pub fn read_console<'i>(console_input: &mut impl AsConsoleInputHandle, buffer: &
 /// # })();
 /// ```
 ///
-pub fn read_console_input_with<'i>(console_input: &mut impl AsConsoleInputHandle, buffer: &'i mut [INPUT_RECORD]) -> io::Result<&'i [INPUT_RECORD]> {
+pub fn read_console_input_with<'i>(console_input: &mut impl AsConsoleInputHandle, buffer: &'i mut [InputRecord]) -> io::Result<&'i [InputRecord]> {
     let length : DWORD = buffer.len().try_into().unwrap_or(!0);
     let mut read = 0;
-    succeeded_to_result(unsafe { ReadConsoleInputW(console_input.as_raw_handle().cast(), buffer.as_mut_ptr(), length, &mut read) })?;
+    succeeded_to_result(unsafe { ReadConsoleInputW(console_input.as_raw_handle().cast(), buffer.as_mut_ptr().cast(), length, &mut read) })?;
     Ok(&buffer[.. read as _])
 }
 
@@ -388,11 +388,11 @@ pub fn read_console_input_with<'i>(console_input: &mut impl AsConsoleInputHandle
 /// # })();
 /// ```
 ///
-pub fn read_console_input<'i>(console_input: &mut impl AsConsoleInputHandle) -> io::Result<impl Iterator<Item = INPUT_RECORD>> {
+pub fn read_console_input<'i>(console_input: &mut impl AsConsoleInputHandle) -> io::Result<impl Iterator<Item = InputRecord>> {
     const N : usize = 32;
-    let mut buffer : [INPUT_RECORD; N] = unsafe { zeroed() };
+    let mut buffer = [InputRecord::default(); N];
     let mut read = 0;
-    succeeded_to_result(unsafe { ReadConsoleInputW(console_input.as_raw_handle().cast(), buffer.as_mut_ptr(), N as _, &mut read) })?;
+    succeeded_to_result(unsafe { ReadConsoleInputW(console_input.as_raw_handle().cast(), buffer.as_mut_ptr().cast(), N as _, &mut read) })?;
     #[allow(deprecated)] // avoid bumping MSRV
     Ok(std::array::IntoIter::new(buffer).take(read as _))
 }
@@ -412,10 +412,10 @@ pub fn read_console_input<'i>(console_input: &mut impl AsConsoleInputHandle) -> 
 /// # })();
 /// ```
 ///
-pub fn read_console_input_one<'i>(console_input: &mut impl AsConsoleInputHandle) -> io::Result<INPUT_RECORD> {
-    let mut record : INPUT_RECORD = unsafe { zeroed() };
+pub fn read_console_input_one<'i>(console_input: &mut impl AsConsoleInputHandle) -> io::Result<InputRecord> {
+    let mut record = InputRecord::default();
     let mut read = 0;
-    succeeded_to_result(unsafe { ReadConsoleInputW(console_input.as_raw_handle().cast(), &mut record, 1, &mut read) })?;
+    succeeded_to_result(unsafe { ReadConsoleInputW(console_input.as_raw_handle().cast(), core::ptr::from_mut(&mut record).cast(), 1, &mut read) })?;
     debug_assert_eq!(read, 1);
     Ok(record)
 }
@@ -657,25 +657,26 @@ pub fn write_console(console_output: &mut impl AsConsoleOutputHandle, buffer: &[
 /// # use maulingmonkey_console_winapi_wrappers::*;
 /// # use std::io::{self, *};
 /// # let _ = (|| -> io::Result<()> { unsafe {
-/// use winapi::um::{wincontypes::*, winuser::*};
+/// use winapi::um::winuser::VK_SPACE;
 ///
-/// let mut input = INPUT_RECORD::default();
-/// input.EventType = KEY_EVENT;
-/// *input.Event.KeyEvent_mut() = KEY_EVENT_RECORD {
-///     bKeyDown: 1, wRepeatCount: 0, wVirtualKeyCode: VK_SPACE as _,
-///     wVirtualScanCode: b' ' as _, .. Default::default()
+/// let input = KeyEventRecord {
+///     key_down:           true.into(),
+///     repeat_count:       0,
+///     virtual_key_code:   VK_SPACE as _,
+///     virtual_scan_code:  b' '.into(),
+///     char:               b' '.into(),
+///     control_key_state:  0,
 /// };
-/// *input.Event.KeyEvent_mut().uChar.UnicodeChar_mut() = ' ' as u32 as u16;
 ///
-/// write_console_input(&mut stdin(), &[input])?;
+/// write_console_input(&mut stdin(), &[input.into()])?;
 /// # Ok(())
 /// # }})();
 /// ```
 ///
-pub fn write_console_input(console_input: &mut impl AsConsoleInputHandle, buffer: &[INPUT_RECORD]) -> io::Result<usize> {
+pub fn write_console_input(console_input: &mut impl AsConsoleInputHandle, buffer: &[InputRecord]) -> io::Result<usize> {
     let length = buffer.len().try_into().unwrap_or(!0);
     let mut written = 0;
-    succeeded_to_result(unsafe { WriteConsoleInputW(console_input.as_raw_handle().cast(), buffer.as_ptr(), length, &mut written) })?;
+    succeeded_to_result(unsafe { WriteConsoleInputW(console_input.as_raw_handle().cast(), buffer.as_ptr().cast(), length, &mut written) })?;
     Ok(written as _ )
 }
 
