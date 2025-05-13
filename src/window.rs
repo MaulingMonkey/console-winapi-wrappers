@@ -88,18 +88,17 @@ pub fn get_console_window() -> io::Result<HWND> {
 /// ### Example
 /// ```
 /// # use maulingmonkey_console_winapi_wrappers::*;
-/// # use winapi::um::wincontypes::COORD;
 /// # use std::io::{self, *};
 /// # let _ = (|| -> io::Result<()> {
-/// let s : COORD = get_largest_console_window_size(&stdout())?;
+/// let s : Coord = get_largest_console_window_size(&stdout())?;
 /// # Ok(())
 /// # })();
 /// ```
 ///
-pub fn get_largest_console_window_size(console_output: &impl AsConsoleOutputHandle) -> io::Result<COORD> {
+pub fn get_largest_console_window_size(console_output: &impl AsConsoleOutputHandle) -> io::Result<Coord> {
     match unsafe { GetLargestConsoleWindowSize(console_output.as_raw_handle().cast()) } {
         COORD { X: 0, Y: 0 }    => Err(io::Error::last_os_error()),
-        c                       => Ok(c),
+        c                       => Ok(c.into()),
     }
 }
 

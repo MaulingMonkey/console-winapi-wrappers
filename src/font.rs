@@ -24,16 +24,16 @@ use std::mem::{size_of_val, zeroed};
 /// # let _ = (|| -> io::Result<()> {
 /// let font = get_current_console_font(&stdout(), false)?;
 /// let font_size = unsafe { get_console_font_size(&stdout(), font.nFont)? };
-/// assert_eq!(font_size.X, font.dwFontSize.X);
-/// assert_eq!(font_size.Y, font.dwFontSize.Y);
+/// assert_eq!(font_size.x, font.dwFontSize.X);
+/// assert_eq!(font_size.y, font.dwFontSize.Y);
 /// # Ok(())
 /// # })();
 /// ```
 ///
-pub unsafe fn get_console_font_size(console_output: &impl AsConsoleOutputHandle, nfont: DWORD) -> io::Result<COORD> {
+pub unsafe fn get_console_font_size(console_output: &impl AsConsoleOutputHandle, nfont: DWORD) -> io::Result<Coord> {
     match unsafe { GetConsoleFontSize(console_output.as_raw_handle().cast(), nfont) } {
         COORD { X: 0, Y: 0 }    => Err(io::Error::last_os_error()),
-        coord                   => Ok(coord),
+        coord                   => Ok(coord.into()),
     }
 }
 

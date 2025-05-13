@@ -586,6 +586,7 @@ pub fn set_console_cursor_position(console_output: &mut impl AsConsoleOutputHand
 /// # let _ = (|| -> io::Result<()> {
 /// set_console_screen_buffer_size(&mut stdout(), (80, 25))?;
 /// set_console_screen_buffer_size(&mut stdout(), [80, 25])?;
+/// set_console_screen_buffer_size(&mut stdout(), Coord { x: 80, y: 25 })?;
 /// use winapi::um::wincontypes::COORD;
 /// set_console_screen_buffer_size(&mut stdout(), COORD { X: 80, Y: 25 })?;
 /// # Ok(())
