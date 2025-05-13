@@ -1,8 +1,11 @@
-#![doc = include_str!("../doc/console-function-mapping.md")]
+#![doc = include_str!("../Readme.md")]
 #![cfg(windows)]
 #![allow(unused_unsafe)]
 
 
+
+#[doc = include_str!("../doc/console-function-mapping.md")]
+#[cfg(doc)] pub mod _console_function_mapping {}
 
 #[path = r"values\_values.rs"]                      mod values;                 pub use values::*;
 

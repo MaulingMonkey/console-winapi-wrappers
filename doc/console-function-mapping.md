@@ -1,4 +1,4 @@
-<!-- https://learn.microsoft.com/en-us/windows/console/console-functions -->
+\[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/console-functions)\] Mapping between C/C++/[`winapi`] ↔ [this crate](crate)
 
 <style>.content { max-width: none; }</style>
 
