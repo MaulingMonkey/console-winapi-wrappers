@@ -664,7 +664,7 @@ pub fn write_console(console_output: &mut impl AsConsoleOutputHandle, buffer: &[
 ///     repeat_count:       0,
 ///     virtual_key_code:   VK_SPACE as _,
 ///     virtual_scan_code:  b' '.into(),
-///     char:               b' '.into(),
+///     char:               u16::from(b' ').into(),
 ///     control_key_state:  0,
 /// };
 ///
