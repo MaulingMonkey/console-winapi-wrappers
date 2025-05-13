@@ -17,8 +17,8 @@ Unstable wrapper API for [winapi](https://docs.rs/winapi/)'s [Console Functions]
 
 ```toml
 # Cargo.toml
-[dependencies]
-maulingmonkey-console-winapi-wrappers.git = "https://github.com/MaulingMonkey/console-winapi-wrappers"
+[dependencies.maulingmonkey-console-winapi-wrappers]
+git = "https://github.com/MaulingMonkey/console-winapi-wrappers"
 ```
 
 ```rust
