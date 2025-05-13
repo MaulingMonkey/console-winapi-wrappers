@@ -14,7 +14,7 @@
         },
         {
             "label":            "help",
-            "command":          "cargo doc --no-deps --open",
+            "command":          "cargo doc --open",
         },
 
 
