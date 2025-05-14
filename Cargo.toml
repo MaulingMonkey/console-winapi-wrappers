@@ -16,6 +16,9 @@ path                = "src/_lib.rs"
 abibool.version     = "0.5"
 abibool.features    = ["bytemuck"]
 
+abistr.version      = "0.2.0-rc3"
+abistr.features     = ["std"] # XXX
+
 bytemuck.version    = "1"
 bytemuck.features   = ["derive"]
 

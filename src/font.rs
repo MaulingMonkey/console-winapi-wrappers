@@ -3,9 +3,10 @@ use crate::*;
 use winapi::shared::minwindef::DWORD;
 use winapi::um::wincon::*;
 
-use std::convert::*;
 use std::io;
-use std::mem::{size_of_val, zeroed};
+
+use core::convert::*;
+use core::mem::size_of_val;
 
 
 
@@ -15,7 +16,7 @@ use std::mem::{size_of_val, zeroed};
 ///
 /// ### Safety
 ///
-/// * $5 says `nfont` is missing bounds checks or overflows on some version of Windows, Wine, or ReactOS.
+/// * $5 says `font` is missing bounds checks or overflows on some version of Windows, Wine, or ReactOS.
 ///
 /// ### Example
 /// ```
@@ -23,9 +24,9 @@ use std::mem::{size_of_val, zeroed};
 /// # use std::io::{self, *};
 /// # let _ = (|| -> io::Result<()> {
 /// let font = get_current_console_font(&stdout(), false)?;
-/// let font_size = unsafe { get_console_font_size(&stdout(), font.nFont)? };
-/// assert_eq!(font_size.x, font.dwFontSize.X);
-/// assert_eq!(font_size.y, font.dwFontSize.Y);
+/// let font_size = unsafe { get_console_font_size(&stdout(), font.font)? };
+/// assert_eq!(font_size.x, font.font_size.x);
+/// assert_eq!(font_size.y, font.font_size.y);
 /// # Ok(())
 /// # })();
 /// ```
@@ -51,10 +52,10 @@ pub unsafe fn get_console_font_size(console_output: &impl AsConsoleOutputHandle,
 /// # })();
 /// ```
 ///
-pub fn get_current_console_font(console_output: &impl AsConsoleOutputHandle, maximum_window: bool) -> io::Result<CONSOLE_FONT_INFO> {
-    let mut info : CONSOLE_FONT_INFO = unsafe { zeroed() };
+pub fn get_current_console_font(console_output: &impl AsConsoleOutputHandle, maximum_window: bool) -> io::Result<ConsoleFontInfo> {
+    let mut info = ConsoleFontInfo::default().into();
     succeeded_to_result(unsafe { GetCurrentConsoleFont(console_output.as_raw_handle().cast(), maximum_window.into(), &mut info) })?;
-    Ok(info)
+    Ok(info.into())
 }
 
 #[doc(alias = "GetCurrentConsoleFontEx")]
@@ -71,11 +72,11 @@ pub fn get_current_console_font(console_output: &impl AsConsoleOutputHandle, max
 /// # })();
 /// ```
 ///
-pub fn get_current_console_font_ex(console_output: &impl AsConsoleOutputHandle, maximum_window: bool) -> io::Result<CONSOLE_FONT_INFOEX> {
-    let mut info : CONSOLE_FONT_INFOEX = unsafe { zeroed() };
+pub fn get_current_console_font_ex(console_output: &impl AsConsoleOutputHandle, maximum_window: bool) -> io::Result<ConsoleFontInfoEx> {
+    let mut info : CONSOLE_FONT_INFOEX = ConsoleFontInfoEx::default().into();
     info.cbSize = size_of_val(&info) as _;
     succeeded_to_result(unsafe { GetCurrentConsoleFontEx(console_output.as_raw_handle().cast(), maximum_window.into(), &mut info) })?;
-    Ok(info)
+    Ok(info.into())
 }
 
 // TODO: SetCurrentConsoleFontEx
