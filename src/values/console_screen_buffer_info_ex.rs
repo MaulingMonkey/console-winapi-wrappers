@@ -75,3 +75,7 @@ const _ : () = {
     assert!(offset_of!(ConsoleScreenBufferInfoEx, fullscreen_supported  ) == offset_of!(CONSOLE_SCREEN_BUFFER_INFOEX, bFullscreenSupported  ));
     assert!(offset_of!(ConsoleScreenBufferInfoEx, color_table           ) == offset_of!(CONSOLE_SCREEN_BUFFER_INFOEX, ColorTable            ));
 };
+
+#[test] fn layout() {
+    assert_eq!(size_of::<CONSOLE_SCREEN_BUFFER_INFOEX>(), size_of::<ConsoleScreenBufferInfoEx>(), "`CONSOLE_SCREEN_BUFFER_INFOEX` has gained new fields, update `ConsoleScreenBufferInfoEx`");
+}
