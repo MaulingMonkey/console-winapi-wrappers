@@ -79,7 +79,9 @@ pub fn get_console_alias<'t>(source: impl AsRef<OsStr>, target_buffer: &'t mut i
     let target_buffer   = target_buffer .as_mut();
     let mut source      = widen0(source     ); // unmodified, GetConsoleAliasW just has bad const qualifications
     let mut exe_name    = widen0(exe_name   ); // unmodified, GetConsoleAliasW just has bad const qualifications
-    let bytes = wrap_last_error(|| unsafe { GetConsoleAliasW(source.as_mut_ptr(), target_buffer.as_mut_ptr(), size_of_val(target_buffer) as _, exe_name.as_mut_ptr()) })?;
+
+    // SAFETY: yes, `GetConsoleAliasW` expects a buffer size in *bytes*, not *units*
+    let bytes = wrap_last_error(|| unsafe { GetConsoleAliasW(source.as_mut_ptr(), target_buffer.as_mut_ptr(), u32::try_from(size_of_val(target_buffer)).unwrap_or(!1), exe_name.as_mut_ptr()) })?;
     Ok(TextRef(strip0(&target_buffer[..(bytes/2) as _])))
 }
 
@@ -104,7 +106,8 @@ pub fn get_console_alias_os(source: impl AsRef<OsStr>, exe_name: impl AsRef<OsSt
     let mut source      = widen0(source     ); // unmodified, GetConsoleAliasW just has bad const qualifications
     let mut exe_name    = widen0(exe_name   ); // unmodified, GetConsoleAliasW just has bad const qualifications
 
-    match wrap_last_error(|| unsafe { GetConsoleAliasW(source.as_mut_ptr(), target_buffer.as_mut_ptr(), size_of_val(&target_buffer) as _, exe_name.as_mut_ptr()) }) {
+    // SAFETY: yes, `GetConsoleAliasW` expects a buffer size in *bytes*, not *units*
+    match wrap_last_error(|| unsafe { GetConsoleAliasW(source.as_mut_ptr(), target_buffer.as_mut_ptr(), size_of_val_32_sized(&target_buffer), exe_name.as_mut_ptr()) }) {
         Ok(bytes) => return Ok(wide0_to_os(&target_buffer[..(bytes/2) as _])),
         Err(err) if err.raw_os_error() == Some(ERROR_INSUFFICIENT_BUFFER as _) => {},
         Err(err) => return Err(err),
@@ -113,7 +116,9 @@ pub fn get_console_alias_os(source: impl AsRef<OsStr>, exe_name: impl AsRef<OsSt
     let mut target_buffer = vec![0u16; 0];
     loop {
         target_buffer.resize(target_buffer.capacity(), 0);
-        match wrap_last_error(|| unsafe { GetConsoleAliasW(source.as_mut_ptr(), target_buffer.as_mut_ptr(), size_of_val(&target_buffer) as _, exe_name.as_mut_ptr()) }) {
+
+        // SAFETY: yes, `GetConsoleAliasW` expects a buffer size in *bytes*, not *units*
+        match wrap_last_error(|| unsafe { GetConsoleAliasW(source.as_mut_ptr(), target_buffer.as_mut_ptr(), u32::try_from(size_of_val(&target_buffer[..])).unwrap_or(!1), exe_name.as_mut_ptr()) }) {
             Ok(bytes) => return Ok(wide0_to_os(&target_buffer[..(bytes/2) as _])),
             Err(err) if err.raw_os_error() == Some(ERROR_INSUFFICIENT_BUFFER as _) => {},
             Err(err) => return Err(err),
@@ -175,7 +180,9 @@ pub fn get_console_aliases<'t>(alias_buffer: &'t mut impl AsMut<[u16]>, exe_name
 /// *   `exe_name` should be `\0` terminated
 unsafe fn get_console_aliases_impl<'t>(alias_buffer: &'t mut [u16], exe_name: &mut [u16]) -> io::Result<TextNsvRef<'t>> {
     debug_assert!(exe_name.ends_with(&[0]));
-    let bytes = wrap_last_error(|| unsafe { GetConsoleAliasesW(alias_buffer.as_mut_ptr(), size_of_val(alias_buffer) as _, exe_name.as_mut_ptr()) })?;
+
+    // SAFETY: yes, `GetConsoleAliasW` expects a buffer size in *bytes*, not *units*
+    let bytes = wrap_last_error(|| unsafe { GetConsoleAliasesW(alias_buffer.as_mut_ptr(), u32::try_from(size_of_val(alias_buffer)).unwrap_or(!1), exe_name.as_mut_ptr()) })?;
     Ok(TextNsvRef(&alias_buffer[..(bytes/2) as _]))
 }
 
@@ -270,7 +277,9 @@ unsafe fn get_console_aliases_length_impl(exe_name: &mut [u16]) -> TextLength {
 ///
 pub fn get_console_alias_exes(exe_name_buffer: &mut impl AsMut<[u16]>) -> io::Result<TextNsvRef> {
     let exe_name_buffer = exe_name_buffer.as_mut();
-    let bytes = wrap_last_error(|| unsafe { GetConsoleAliasExesW(exe_name_buffer.as_mut_ptr(), size_of_val(exe_name_buffer) as _) })?;
+
+    // SAFETY: yes, `GetConsoleAliasW` expects a buffer size in *bytes*, not *units*
+    let bytes = wrap_last_error(|| unsafe { GetConsoleAliasExesW(exe_name_buffer.as_mut_ptr(), u32::try_from(size_of_val(exe_name_buffer)).unwrap_or(!1)) })?;
     Ok(TextNsvRef(&exe_name_buffer[..(bytes/2) as _]))
 }
 

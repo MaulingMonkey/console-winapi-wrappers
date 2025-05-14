@@ -1,4 +1,4 @@
-use crate::Coord;
+use crate::{size_of_32, Coord};
 use winapi::um::wincon::CONSOLE_FONT_INFOEX;
 use winapi::um::wingdi::LF_FACESIZE;
 
@@ -7,7 +7,7 @@ use winapi::um::wingdi::LF_FACESIZE;
 #[doc(alias = "CONSOLE_FONT_INFOEX")]
 /// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/console-font-infoex)\]
 ///
-#[derive(Clone, Copy, Default, Debug)] // PartialEq, Eq, PartialOrd, Ord, Hash?
+#[derive(Clone, Copy, Debug)] // PartialEq, Eq, PartialOrd, Ord, Hash?
 #[repr(C)] pub struct ConsoleFontInfoEx {
     pub self_size:      u32,
     pub font:           u32,
@@ -24,6 +24,15 @@ use winapi::um::wingdi::LF_FACESIZE;
 unsafe impl bytemuck::Pod       for ConsoleFontInfoEx {}
 unsafe impl bytemuck::Zeroable  for ConsoleFontInfoEx {}
 const _ : () = assert!(size_of::<ConsoleFontInfoEx>() < size_of::<Option<ConsoleFontInfoEx>>(), "unexpected niche available in `ConsoleFontInfoEx`, it's probably not `bytemuck::Pod`");
+
+impl Default for ConsoleFontInfoEx {
+    fn default() -> Self {
+        Self {
+            self_size: size_of_32::<Self>(),
+            .. bytemuck::Zeroable::zeroed()
+        }
+    }
+}
 
 impl From<CONSOLE_FONT_INFOEX> for ConsoleFontInfoEx {
     fn from(value: CONSOLE_FONT_INFOEX) -> Self {

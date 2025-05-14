@@ -6,7 +6,6 @@ use winapi::um::wincon::*;
 
 use std::convert::*;
 use std::io;
-use std::mem::{size_of_val, zeroed};
 use std::ptr::*;
 
 
@@ -139,7 +138,7 @@ pub fn get_console_display_mode() -> io::Result<DWORD> {
 /// ```
 ///
 pub fn get_console_history_info() -> io::Result<CONSOLE_HISTORY_INFO> {
-    let mut info : CONSOLE_HISTORY_INFO = unsafe { zeroed() };
+    let mut info = Default::default();
     succeeded_to_result(unsafe { GetConsoleHistoryInfo(&mut info) })?;
     Ok(info)
 }
@@ -159,7 +158,7 @@ pub fn get_console_history_info() -> io::Result<CONSOLE_HISTORY_INFO> {
 /// ```
 ///
 pub fn get_console_screen_buffer_info(console_output: &impl AsConsoleOutputHandle) -> io::Result<ConsoleScreenBufferInfo> {
-    let mut info : CONSOLE_SCREEN_BUFFER_INFO = unsafe { zeroed() };
+    let mut info = Default::default();
     succeeded_to_result(unsafe { GetConsoleScreenBufferInfo(console_output.as_raw_handle().cast(), &mut info) })?;
     Ok(info.into())
 }
@@ -179,8 +178,8 @@ pub fn get_console_screen_buffer_info(console_output: &impl AsConsoleOutputHandl
 /// ```
 ///
 pub fn get_console_screen_buffer_info_ex(console_output: &impl AsConsoleOutputHandle) -> io::Result<ConsoleScreenBufferInfoEx> {
-    let mut info : CONSOLE_SCREEN_BUFFER_INFOEX = unsafe { zeroed() };
-    info.cbSize = size_of_val(&info) as _;
+    let mut info : CONSOLE_SCREEN_BUFFER_INFOEX = Default::default();
+    info.cbSize = size_of_val_32_sized(&info);
     succeeded_to_result(unsafe { GetConsoleScreenBufferInfoEx(console_output.as_raw_handle().cast(), &mut info) })?;
     Ok(info.into())
 }
@@ -200,7 +199,7 @@ pub fn get_console_screen_buffer_info_ex(console_output: &impl AsConsoleOutputHa
 /// ```
 ///
 pub fn get_console_selection_info() -> io::Result<CONSOLE_SELECTION_INFO> {
-    let mut info : CONSOLE_SELECTION_INFO = unsafe { zeroed() };
+    let mut info = Default::default();
     succeeded_to_result(unsafe { GetConsoleSelectionInfo(&mut info) })?;
     Ok(info)
 }

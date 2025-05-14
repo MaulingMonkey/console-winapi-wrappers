@@ -6,7 +6,6 @@ use winapi::um::wincon::*;
 use std::io;
 
 use core::convert::*;
-use core::mem::size_of_val;
 
 
 
@@ -53,7 +52,7 @@ pub unsafe fn get_console_font_size(console_output: &impl AsConsoleOutputHandle,
 /// ```
 ///
 pub fn get_current_console_font(console_output: &impl AsConsoleOutputHandle, maximum_window: bool) -> io::Result<ConsoleFontInfo> {
-    let mut info = ConsoleFontInfo::default().into();
+    let mut info = Default::default();
     succeeded_to_result(unsafe { GetCurrentConsoleFont(console_output.as_raw_handle().cast(), maximum_window.into(), &mut info) })?;
     Ok(info.into())
 }
@@ -73,8 +72,8 @@ pub fn get_current_console_font(console_output: &impl AsConsoleOutputHandle, max
 /// ```
 ///
 pub fn get_current_console_font_ex(console_output: &impl AsConsoleOutputHandle, maximum_window: bool) -> io::Result<ConsoleFontInfoEx> {
-    let mut info : CONSOLE_FONT_INFOEX = ConsoleFontInfoEx::default().into();
-    info.cbSize = size_of_val(&info) as _;
+    let mut info : CONSOLE_FONT_INFOEX = Default::default();
+    info.cbSize = size_of_val_32_sized(&info);
     succeeded_to_result(unsafe { GetCurrentConsoleFontEx(console_output.as_raw_handle().cast(), maximum_window.into(), &mut info) })?;
     Ok(info.into())
 }

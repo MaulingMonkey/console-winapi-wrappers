@@ -1,4 +1,4 @@
-use crate::{Attributes, ColorRef, Coord, SmallRect};
+use crate::{size_of_32, Attributes, ColorRef, Coord, SmallRect};
 use winapi::um::wincon::CONSOLE_SCREEN_BUFFER_INFOEX;
 
 
@@ -6,7 +6,7 @@ use winapi::um::wincon::CONSOLE_SCREEN_BUFFER_INFOEX;
 #[doc(alias = "CONSOLE_SCREEN_BUFFER_INFOEX")]
 /// \[[microsoft.com](https://learn.microsoft.com/en-us/windows/console/console-screen-buffer-infoex)\]
 ///
-#[derive(Clone, Copy, bytemuck::Pod, Default, bytemuck::Zeroable, Debug)] // PartialEq, Eq, PartialOrd, Ord, Hash?
+#[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable, Debug)] // PartialEq, Eq, PartialOrd, Ord, Hash?
 #[repr(C)] pub struct ConsoleScreenBufferInfoEx {
     pub self_size:              u32,
     pub size:                   Coord,
@@ -21,6 +21,15 @@ use winapi::um::wincon::CONSOLE_SCREEN_BUFFER_INFOEX;
     #[doc(hidden)]
     #[deprecated = "do not directly use this field, instead initialize with e.g. `.. bytemuck::zeroed()`"]
     pub _non_exhaustive:        (),
+}
+
+impl Default for ConsoleScreenBufferInfoEx {
+    fn default() -> Self {
+        Self {
+            self_size: size_of_32::<Self>(),
+            .. bytemuck::Zeroable::zeroed()
+        }
+    }
 }
 
 impl From<CONSOLE_SCREEN_BUFFER_INFOEX> for ConsoleScreenBufferInfoEx {
