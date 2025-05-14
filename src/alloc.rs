@@ -8,8 +8,9 @@ use winapi::um::wincon::*;
 use winapi::um::winnt::*;
 
 use std::io;
-use std::ptr::*;
 use std::os::windows::io::{AsRawHandle, RawHandle};
+
+use core::ptr::*;
 
 
 

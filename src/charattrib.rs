@@ -3,7 +3,7 @@ use bytemuck::{Pod, Zeroable};
 use winapi::shared::minwindef::WORD;
 use winapi::um::wincon;
 
-use std::ops::*;
+use core::ops::*;
 
 
 

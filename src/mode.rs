@@ -3,8 +3,9 @@ use crate::*;
 use winapi::um::consoleapi::*;
 use winapi::um::wincon;
 
-use std::ops::*;
 use std::io;
+
+use core::ops::*;
 
 
 

@@ -6,10 +6,11 @@ use winapi::um::wincon::*;
 
 use std::ffi::*;
 use std::io;
-use std::mem::size_of_val;
-use std::ops::*;
 use std::os::windows::prelude::*;
-use std::ptr::*;
+
+use core::mem::size_of_val;
+use core::ops::*;
+use core::ptr::*;
 
 
 

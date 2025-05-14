@@ -5,7 +5,8 @@ use winapi::um::consoleapi::*;
 use winapi::um::wincon::*;
 
 use std::io;
-use std::ptr::*;
+
+use core::ptr::*;
 
 
 

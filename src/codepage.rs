@@ -4,8 +4,9 @@ use winapi::shared::minwindef::UINT;
 use winapi::um::consoleapi::*;
 use winapi::um::wincon::*;
 
-use std::fmt::{self, Debug, Formatter};
 use std::io;
+
+use core::fmt::{self, Debug, Formatter};
 
 
 

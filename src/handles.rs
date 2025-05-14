@@ -1,8 +1,9 @@
 use crate::*;
 
-use std::fmt::Debug;
 use std::io::*;
 use std::os::windows::io::*;
+
+use core::fmt::Debug;
 
 
 

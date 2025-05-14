@@ -1,7 +1,8 @@
 use std::ffi::*;
-use std::fmt::{self, Debug, Formatter};
-use std::ops::*;
 use std::os::windows::prelude::*;
+
+use core::fmt::{self, Debug, Formatter};
+use core::ops::*;
 
 
 
