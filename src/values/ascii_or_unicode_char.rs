@@ -1,7 +1,5 @@
 use bytemuck::{Pod, Zeroable};
 
-use core::convert::TryFrom;
-
 
 
 #[doc(alias = "CHAR_INFO::Char")]

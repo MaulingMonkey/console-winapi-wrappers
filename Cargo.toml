@@ -3,7 +3,7 @@
 [package]
 name                = "maulingmonkey-console-winapi-wrappers"
 version             = "0.0.0-git"
-edition             = "2018"
+edition             = "2024"
 repository          = "https://github.com/MaulingMonkey/maulingmonkey-console-winapi-wrappers"
 authors             = ["MaulingMonkey <git@maulingmonkey.com>"]
 readme              = "Readme.md"

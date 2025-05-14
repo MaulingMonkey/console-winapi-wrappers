@@ -4,7 +4,6 @@ use winapi::shared::winerror::*;
 use winapi::um::errhandlingapi::*;
 use winapi::um::wincon::*;
 
-use std::convert::*;
 use std::ffi::*;
 use std::io;
 use std::mem::size_of_val;
@@ -253,7 +252,7 @@ pub fn get_console_aliases_length(exe_name: impl AsRef<OsStr>) -> TextLength {
 /// *   `exe_name` should be `\0` terminated
 unsafe fn get_console_aliases_length_impl(exe_name: &mut [u16]) -> TextLength {
     debug_assert!(exe_name.ends_with(&[0]));
-    TextLength(GetConsoleAliasesLengthW(exe_name.as_mut_ptr()) as _)
+    TextLength(unsafe { GetConsoleAliasesLengthW(exe_name.as_mut_ptr()) } as _)
 }
 
 

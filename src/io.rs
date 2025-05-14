@@ -4,7 +4,6 @@ use winapi::shared::minwindef::DWORD;
 use winapi::um::consoleapi::*;
 use winapi::um::wincon::*;
 
-use std::convert::*;
 use std::io;
 use std::ptr::*;
 

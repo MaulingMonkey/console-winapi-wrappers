@@ -2,7 +2,6 @@ use crate::{AsciiOrUnicodeChar, Coord, InputRecordEventType};
 use crate::{FOCUS_EVENT, KEY_EVENT, MENU_EVENT, MOUSE_EVENT, WINDOW_BUFFER_SIZE_EVENT};
 use winapi::um::wincon::{FOCUS_EVENT_RECORD, INPUT_RECORD, KEY_EVENT_RECORD, MENU_EVENT_RECORD, MOUSE_EVENT_RECORD, WINDOW_BUFFER_SIZE_RECORD};
 use bytemuck::Zeroable;
-use core::convert::{TryFrom, TryInto as _};
 
 
 

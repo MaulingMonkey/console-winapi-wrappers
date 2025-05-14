@@ -5,8 +5,6 @@ use winapi::um::wincon::*;
 
 use std::io;
 
-use core::convert::*;
-
 
 
 #[doc(alias = "GetConsoleFontSize")]
